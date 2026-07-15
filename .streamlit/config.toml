@@ -1,0 +1,21 @@
+[theme]
+
+primaryColor="#2563EB"
+
+backgroundColor="#F8FAFC"
+
+secondaryBackgroundColor="#EEF2FF"
+
+textColor="#111827"
+
+font="sans serif"
+
+[server]
+
+maxUploadSize=2048
+
+enableStaticServing=true
+
+[browser]
+
+gatherUsageStats=false
