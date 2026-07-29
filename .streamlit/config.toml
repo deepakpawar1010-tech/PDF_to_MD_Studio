@@ -1,21 +1,10 @@
 [theme]
-
-primaryColor="#2563EB"
-
-backgroundColor="#F8FAFC"
-
-secondaryBackgroundColor="#EEF2FF"
-
-textColor="#111827"
-
-font="sans serif"
+base = "light"
+primaryColor = "#FF4B4B"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F5F5F8"
+textColor = "#1a1a24"
+font = "sans serif"
 
 [server]
-
-maxUploadSize=2048
-
-enableStaticServing=true
-
-[browser]
-
-gatherUsageStats=false
+maxUploadSize = 200
