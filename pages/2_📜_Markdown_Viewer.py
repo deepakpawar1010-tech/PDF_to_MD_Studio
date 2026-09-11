@@ -17,6 +17,7 @@ from core.ui_helpers import (
     apply_custom_css,
     download_button,
     page_header,
+    render_markdown_with_math,
     render_sidebar,
     setup_page,
     show_error,
@@ -125,7 +126,9 @@ def render_file_preview(file_path: Path) -> None:
     file_ext = file_path.suffix.lower()
 
     # View mode tabs
-    tab_rendered, tab_raw, tab_stats = st.tabs(["🎨 Rendered", "📄 Raw", "📊 Stats"])
+    tab_rendered, tab_raw, tab_edit, tab_stats, tab_cleanup = st.tabs(
+        ["🎨 Rendered", "📄 Raw", "✏️ Edit", "📊 Stats", "🧹 Clean Up"]
+    )
     
     with tab_rendered:
         if file_ext == ".json":
@@ -139,7 +142,7 @@ def render_file_preview(file_path: Path) -> None:
             import streamlit.components.v1 as components
             components.html(content, height=600, scrolling=True)
         else:
-            st.markdown(content)
+            render_markdown_with_math(content, height=650)
     
     with tab_raw:
         raw_language = {"json": "json", "html": "html"}.get(file_ext.lstrip("."), "markdown")
@@ -153,6 +156,78 @@ def render_file_preview(file_path: Path) -> None:
             key="raw_copy_area",
             label_visibility="collapsed",
         )
+
+    with tab_edit:
+        st.caption(
+            "Edit the converted content directly and save your corrections. "
+            "Changes only get written to disk when you click Save."
+        )
+
+        editor_key = f"editor_content_{file_path}"
+        saved_marker_key = f"editor_saved_baseline_{file_path}"
+
+        if editor_key not in st.session_state:
+            st.session_state[editor_key] = content
+        if saved_marker_key not in st.session_state:
+            st.session_state[saved_marker_key] = content
+
+        edit_col, preview_col = st.columns(2)
+
+        with edit_col:
+            st.markdown("**Editor**")
+            edited_content = st.text_area(
+                "Editor",
+                height=500,
+                key=editor_key,
+                label_visibility="collapsed",
+            )
+
+        has_unsaved_changes = edited_content != st.session_state[saved_marker_key]
+
+        with preview_col:
+            preview_label = "**Live Preview**"
+            if has_unsaved_changes:
+                preview_label += " 🟡 *(unsaved changes)*"
+            st.markdown(preview_label)
+            with st.container(height=500):
+                if file_ext == ".json":
+                    import json
+                    try:
+                        st.json(json.loads(edited_content))
+                    except Exception:
+                        st.code(edited_content, language="json")
+                elif file_ext == ".html":
+                    import streamlit.components.v1 as components
+                    components.html(edited_content, height=470, scrolling=True)
+                else:
+                    render_markdown_with_math(edited_content, height=470)
+
+        save_col, discard_col = st.columns(2)
+        with save_col:
+            if st.button(
+                "💾 Save Changes",
+                key=f"save_edit_{file_path}",
+                type="primary",
+                use_container_width=True,
+                disabled=not has_unsaved_changes,
+            ):
+                try:
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(edited_content)
+                    st.session_state[saved_marker_key] = edited_content
+                    st.success(f"Saved changes to {file_path.name}")
+                    st.rerun()
+                except Exception as e:
+                    show_error("Failed to save", str(e))
+        with discard_col:
+            if st.button(
+                "↩️ Discard Changes",
+                key=f"discard_edit_{file_path}",
+                use_container_width=True,
+                disabled=not has_unsaved_changes,
+            ):
+                del st.session_state[editor_key]
+                st.rerun()
     
     with tab_stats:
         # Content statistics
@@ -210,6 +285,61 @@ def render_file_preview(file_path: Path) -> None:
                 st.markdown(f"*... and {len(structure) - 50} more elements*")
         else:
             st.info("No structured elements detected.")
+
+    with tab_cleanup:
+        st.caption(
+            "Auto-fix common Marker conversion mistakes. Nothing is saved until you "
+            "review the preview and click Save - your original file is never touched otherwise."
+        )
+
+        from core.post_processor import AVAILABLE_FIXES, run_cleanup
+
+        enabled_ids = []
+        for fix_id, label, _fn in AVAILABLE_FIXES:
+            if st.checkbox(label, value=True, key=f"cleanup_{fix_id}"):
+                enabled_ids.append(fix_id)
+
+        if st.button("🔍 Preview Cleanup", key="preview_cleanup", type="primary"):
+            cleaned, results = run_cleanup(content, enabled_ids)
+            st.session_state["_cleanup_preview"] = cleaned
+            st.session_state["_cleanup_results"] = results
+            st.session_state["_cleanup_source_file"] = str(file_path)
+
+        preview = st.session_state.get("_cleanup_preview")
+        matches_current_file = st.session_state.get("_cleanup_source_file") == str(file_path)
+
+        if preview and matches_current_file:
+            results = st.session_state.get("_cleanup_results", {})
+            total_fixes = sum(results.values())
+
+            if total_fixes == 0:
+                st.info("No issues found with the selected fixes - file already looks clean.")
+            else:
+                fix_labels = {fid: label for fid, label, _ in AVAILABLE_FIXES}
+                summary = ", ".join(
+                    f"{count}x {fix_labels.get(fid, fid)}" for fid, count in results.items() if count > 0
+                )
+                st.success(f"Found and fixed: {summary}")
+
+                st.markdown("**Preview of cleaned version:**")
+                with st.container(height=400):
+                    st.code(preview, language="markdown")
+
+                save_col, discard_col = st.columns(2)
+                with save_col:
+                    if st.button("💾 Save Cleaned Version", key="save_cleanup", type="primary", use_container_width=True):
+                        try:
+                            with open(file_path, "w", encoding="utf-8") as f:
+                                f.write(preview)
+                            st.success(f"Saved cleaned version to {file_path.name}")
+                            del st.session_state["_cleanup_preview"]
+                            st.rerun()
+                        except Exception as e:
+                            show_error("Failed to save", str(e))
+                with discard_col:
+                    if st.button("❌ Discard", key="discard_cleanup", use_container_width=True):
+                        del st.session_state["_cleanup_preview"]
+                        st.rerun()
 
 
 def render_batch_viewer() -> None:

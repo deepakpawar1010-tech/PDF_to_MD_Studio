@@ -201,6 +201,21 @@ def render_output_settings() -> None:
             f"so {output_format.upper()} outputs will appear directly in your output folder "
             f"but not in that viewer yet."
         )
+
+    # Auto-cleanup toggle
+    st.markdown("#### Auto Cleanup")
+    auto_post_process = settings_toggle(
+        "Automatically clean up Markdown after conversion",
+        key="setting_auto_post_process",
+        default=config.get("auto_post_process", True),
+        help_text=(
+            "Runs the same fixes as the Clean Up tab (misplaced question numbers, "
+            "stray bullets, math delimiters) automatically right after each conversion, "
+            "so you don't need to run it manually in the Markdown Viewer. "
+            "Only applies to Markdown output, not JSON/HTML."
+        ),
+    )
+    config.set("auto_post_process", auto_post_process)
     
     # Preserve images
     preserve_images = settings_toggle(
@@ -242,8 +257,7 @@ def render_appearance_settings() -> None:
     new_theme = "dark" if theme == "Dark" else "light"
     if new_theme != current_theme:
         SessionManager.set_theme(new_theme)
-        st.success(f"Theme changed to {theme}. Reload to apply.")
-        st.button("🔄 Reload App", on_click=lambda: st.rerun(), key="reload_theme")
+        st.rerun()
     
     # Log level
     st.markdown("#### Logging")
