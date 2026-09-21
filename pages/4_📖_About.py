@@ -34,12 +34,12 @@ def render_about_section() -> None:
     st.markdown("### 🎯 Key Features")
     
     features = [
-        ("📄 Single File Conversion", "Convert individual PDFs with full control over output settings and preview results before downloading."),
-        ("📦 Batch Processing", "Process multiple PDFs simultaneously with automatic ZIP packaging for easy distribution."),
-        ("🤖 AI-Powered Engine", "Leverages the Marker library for intelligent text extraction, layout preservation, and structure recognition."),
-        ("🖼️ Image Preservation", "Automatically extracts and preserves images from PDFs, maintaining visual context in your Markdown output."),
-        ("📜 Markdown Viewer", "Built-in preview with raw/rendered modes, content statistics, and document structure analysis."),
-        ("⚙️ Flexible Configuration", "Customize output directories, conversion quality, OCR settings, and appearance preferences."),
+        ("⚡ High-Speed Gemini Engine", "Convert dense, multi-page mathematical documents in seconds using Google's Gemini 3.5 Flash vision model."),
+        ("🧮 100% LaTeX Math Accuracy", "Flawless formatting for formulas, subscripts, superscripts, combinations, fractions, and matrices ($...$ and $$...$$)."),
+        ("📋 Mathpix-Style LaTeX Copy", "Highlight text or click any formula in the rendered preview to copy pure LaTeX source code directly to your clipboard."),
+        ("🔍 50:50 Side-by-Side Studio", "Inspect your original PDF and rendered Markdown side-by-side with full column width and synchronized review."),
+        ("📚 Document Library", "Browse, search, edit, and export your converted documents and extracted assets anytime."),
+        ("🖥️ Offline Marker Fallback", "100% local, offline conversion fallback powered by the Marker engine."),
     ]
     
     for title, description in features:
@@ -122,17 +122,20 @@ def render_credits_section() -> None:
     st.markdown("### 🙏 Credits")
     
     st.markdown(
-        """
-        **PDF to Markdown Studio** is built on top of excellent open-source projects:
+        f"""
+        **{APP_NAME}** is powered by leading AI and document technology:
+        
+        - **[Google Gemini Vision](https://ai.google.dev/)** — 
+          Ultra-fast multimodal vision for dense mathematical OCR and LaTeX conversion
+        
+        - **[KaTeX](https://katex.org/)** — 
+          The fastest math typesetting library for the web with Mathpix-style LaTeX copying
         
         - **[Marker](https://github.com/VikParuchuri/marker)** by Vik Paruchuri — 
-          The core PDF-to-Markdown conversion engine
+          Local offline PDF-to-Markdown engine
         
         - **[Streamlit](https://streamlit.io/)** — 
           The web application framework powering the UI
-        
-        - **Python Community** — 
-          For the countless libraries that make this possible
         """
     )
     

@@ -24,6 +24,7 @@ from core.ui_helpers import (
     download_button,
     file_uploader_area,
     page_header,
+    render_markdown_with_math,
     render_pdf_preview,
     render_sidebar,
     setup_page,
@@ -49,6 +50,7 @@ def run_conversion_with_progress(
     panel_placeholder,
     progress_bar,
     page_range: Optional[str] = None,
+    engine_type: Optional[str] = None,
 ) -> Tuple[bool, str, Optional[Path]]:
     """
     Run conversion with queue-based, STAGE-AWARE progress updates.
@@ -77,6 +79,7 @@ def run_conversion_with_progress(
                 output_dir=output_dir,
                 progress_queue=progress_queue,
                 page_range=page_range,
+                engine_type=engine_type,
             )
             result_container["success"] = success
             result_container["message"] = message
@@ -100,12 +103,17 @@ def run_conversion_with_progress(
         try:
             while True:
                 msg_type, payload = progress_queue.get_nowait()
-                if msg_type == "stage":
-                    ui_state["stage_state"] = payload["stages"]
-                    ui_state["current_stage"] = payload["current_stage"]
-                    ui_state["overall"] = payload["overall"]
+                if msg_type == "stage" and isinstance(payload, dict):
+                    if "stages" in payload:
+                        ui_state["stage_state"] = payload["stages"]
+                    if "current_stage" in payload:
+                        ui_state["current_stage"] = payload["current_stage"]
+                    if "overall" in payload:
+                        ui_state["overall"] = payload["overall"]
+                    if "raw_line" in payload:
+                        ui_state["heartbeat_msg"] = payload["raw_line"]
                 elif msg_type == "heartbeat":
-                    ui_state["heartbeat_msg"] = payload
+                    ui_state["heartbeat_msg"] = str(payload)
         except queue.Empty:
             pass
 
@@ -143,7 +151,12 @@ def run_conversion_with_progress(
     )
 
 
-def handle_single_conversion(uploaded_file, pre_saved_path: Path, page_range: Optional[str] = None) -> None:
+def handle_single_conversion(
+    uploaded_file,
+    pre_saved_path: Path,
+    page_range: Optional[str] = None,
+    engine_type: Optional[str] = None,
+) -> None:
     """Handle single file conversion using pre-saved temp file."""
     manager = get_conversion_manager()
 
@@ -158,6 +171,7 @@ def handle_single_conversion(uploaded_file, pre_saved_path: Path, page_range: Op
             panel_placeholder=panel_placeholder,
             progress_bar=progress_bar,
             page_range=page_range,
+            engine_type=engine_type,
         )
 
         panel_placeholder.empty()
@@ -178,13 +192,13 @@ def handle_single_conversion(uploaded_file, pre_saved_path: Path, page_range: Op
             
             st.markdown("---")
             st.markdown("### 🔍 Compare: Original PDF vs Converted Output")
-            st.caption("Scroll each side independently to spot conversion mistakes side-by-side.")
+            st.caption("Side-by-side 50:50 view: Original PDF on the left, Rendered Markdown with LaTeX math on the right.")
 
-            compare_col_pdf, compare_col_output = st.columns(2)
+            compare_col_pdf, compare_col_output = st.columns(2, gap="medium")
 
             with compare_col_pdf:
                 st.markdown("**📄 Original PDF**")
-                render_pdf_preview(pre_saved_path, height=700)
+                render_pdf_preview(pre_saved_path, height=750)
 
             with compare_col_output:
                 st.markdown(f"**📝 Converted Output** (`{Path(output_path).suffix}`)")
@@ -196,21 +210,21 @@ def handle_single_conversion(uploaded_file, pre_saved_path: Path, page_range: Op
                     tab_rendered, tab_raw = st.tabs(["🎨 Rendered", "📄 Raw"])
 
                     with tab_rendered:
-                        with st.container(height=700):
-                            if out_ext == ".json":
+                        if out_ext == ".json":
+                            with st.container(height=750):
                                 import json
                                 try:
                                     st.json(json.loads(content))
                                 except Exception:
                                     st.code(content, language="json")
-                            elif out_ext == ".html":
-                                import streamlit.components.v1 as components
-                                components.html(content, height=650, scrolling=True)
-                            else:
-                                st.markdown(content)
+                        elif out_ext == ".html":
+                            import streamlit.components.v1 as components
+                            components.html(content, height=750, scrolling=True)
+                        else:
+                            render_markdown_with_math(content, height=750)
 
                     with tab_raw:
-                        with st.container(height=700):
+                        with st.container(height=750):
                             raw_lang = {".json": "json", ".html": "html"}.get(out_ext, "markdown")
                             st.code(content, language=raw_lang)
 
@@ -402,16 +416,16 @@ def handle_batch_conversion(uploaded_files, pre_saved_paths: List[Path]) -> None
 
 
 def render_conversion_page() -> None:
-    """Render the main PDF to Markdown conversion page."""
-    setup_page("PDF to Markdown", "📄")
+    """Render the main PDF to Markdown conversion studio."""
+    setup_page("Studio", "⚡")
     init_session()
     render_sidebar()
     
-    page_header("📄 PDF to Markdown", "Convert your PDFs to clean, structured Markdown")
+    page_header("⚡ Conversion Studio", "Convert PDFs to clean Markdown with 100% LaTeX math accuracy")
     
-    st.markdown("### Select Conversion Mode")
+    st.markdown("### Select Conversion Mode & Engine")
     
-    mode_col, format_col, images_col = st.columns([2, 1, 1])
+    mode_col, engine_col, format_col, images_col = st.columns([1.5, 1.8, 1, 1])
 
     with mode_col:
         mode = st.radio(
@@ -422,8 +436,24 @@ def render_conversion_page() -> None:
             key="conversion_mode",
         )
 
-    with format_col:
+    with engine_col:
         config = get_config()
+        current_engine = config.get("engine", "gemini")
+        engine_options = ["⚡ Gemini Flash (Fast & Exact)", "🖥️ Marker (Local Offline)"]
+        engine_index = 0 if current_engine == "gemini" else 1
+        selected_engine_label = st.selectbox(
+            "Engine",
+            options=engine_options,
+            index=engine_index,
+            key="quick_engine_select",
+            label_visibility="collapsed",
+            help="Gemini Flash converts in seconds with 100% LaTeX math accuracy. Marker runs locally on your GPU/CPU.",
+        )
+        selected_engine = "gemini" if "Gemini" in selected_engine_label else "marker"
+        if selected_engine != current_engine:
+            config.set("engine", selected_engine)
+
+    with format_col:
         format_options = ["markdown", "json", "html"]
         current_format = config.get("output_format", "markdown")
         selected_format = st.selectbox(
@@ -440,13 +470,27 @@ def render_conversion_page() -> None:
     with images_col:
         current_extract = config.get("preserve_images", True)
         extract_images = st.checkbox(
-            "🖼️ Extract Images",
+            "🖼️ Images",
             value=current_extract,
             key="quick_extract_images",
             help="Turn off to skip image extraction entirely - faster, and skips writing image files to disk.",
         )
         if extract_images != current_extract:
             config.set("preserve_images", extract_images)
+
+    # API key prompt banner if Gemini is selected without key
+    import os
+    if selected_engine == "gemini" and not config.get("gemini_api_key") and not os.environ.get("GEMINI_API_KEY"):
+        st.info("💡 **Gemini API Key Required:** Please enter your free Gemini API key below to use high-speed conversion (get one free at [aistudio.google.com](https://aistudio.google.com)).")
+        api_key_col1, api_key_col2 = st.columns([3, 1])
+        with api_key_col1:
+            api_key_val = st.text_input("Gemini API Key", type="password", key="quick_api_key_input", label_visibility="collapsed", placeholder="Paste your Gemini API key here...")
+        with api_key_col2:
+            if st.button("Save Key", key="btn_save_quick_api_key", use_container_width=True):
+                if api_key_val and api_key_val.strip():
+                    config.set("gemini_api_key", api_key_val.strip())
+                    st.success("API key saved!")
+                    st.rerun()
     
     st.markdown("---")
     
@@ -486,6 +530,7 @@ def render_conversion_page() -> None:
                                 uploaded_file,
                                 temp_path,
                                 page_range=page_range_input.strip() or None,
+                                engine_type=selected_engine,
                             )
                 else:
                     show_error("Invalid File", error)

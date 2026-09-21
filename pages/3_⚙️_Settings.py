@@ -110,9 +110,72 @@ def render_conversion_settings() -> None:
     st.markdown("### ⚙️ Conversion")
     
     config = get_config()
+
+    # Engine Selection
+    st.markdown("#### Primary Engine")
+    current_engine = config.get("engine", "gemini")
+    engine_options = ["⚡ Gemini Flash (Fast & Exact Math)", "🖥️ Marker (Local Offline)"]
+    selected_label = st.radio(
+        "Default Conversion Engine",
+        options=engine_options,
+        index=0 if current_engine == "gemini" else 1,
+        key="setting_default_engine",
+        help="Gemini Flash converts documents in seconds with 100% LaTeX math accuracy. Marker runs locally on your GPU/CPU.",
+    )
+    new_engine = "gemini" if "Gemini" in selected_label else "marker"
+    config.set("engine", new_engine)
+
+    # Gemini Settings Card
+    st.markdown("#### ⚡ Gemini Engine Settings")
+    st.caption("Free tier available at [aistudio.google.com](https://aistudio.google.com) (1,500 free conversions/day).")
+    
+    current_key = config.get("gemini_api_key", "")
+    new_key = st.text_input(
+        "Gemini API Key",
+        value=current_key,
+        type="password",
+        key="setting_gemini_api_key",
+        help="Your Google Gemini API Key. Can also be set via GEMINI_API_KEY environment variable.",
+    )
+    if new_key != current_key:
+        config.set("gemini_api_key", new_key.strip())
+        st.success("Gemini API key saved!")
+
+    model_options = [
+        "gemini-3.5-flash-lite",
+        "gemini-flash-lite-latest",
+        "gemini-3.1-flash-lite",
+        "gemini-3.5-flash",
+        "gemini-3.6-flash",
+        "gemini-3.7-flash",
+        "gemini-3.8-flash",
+    ]
+    current_model = config.get("gemini_model", "gemini-3.5-flash-lite")
+    selected_model = st.selectbox(
+        "Gemini Model",
+        options=model_options,
+        index=model_options.index(current_model) if current_model in model_options else 0,
+        key="setting_gemini_model",
+        help="Gemini 3.5 Flash-Lite is recommended for ultra-fast conversion, 1,500 free pages/day, and 100% accurate LaTeX math.",
+    )
+    if selected_model != current_model:
+        config.set("gemini_model", selected_model)
+
+    if new_key:
+        if st.button("🧪 Test Gemini API Connection", key="btn_test_gemini"):
+            try:
+                from google import genai
+                client = genai.Client(api_key=new_key.strip())
+                resp = client.models.generate_content(model=selected_model, contents="Ping")
+                if resp.text:
+                    st.success(f"✅ Connection successful! Model `{selected_model}` is ready.")
+            except Exception as e:
+                st.error(f"❌ Connection failed: {e}")
+
+    st.markdown("---")
     
     # Marker path
-    st.markdown("#### Marker Executable")
+    st.markdown("#### 🖥️ Marker Executable Settings")
     marker_path = config.get_marker_path()
     st.markdown(f"Detected: `{marker_path}`")
     

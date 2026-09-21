@@ -441,12 +441,12 @@ def render_search() -> None:
 
 
 def render_viewer_page() -> None:
-    """Render the complete Markdown viewer page."""
-    setup_page("Markdown Viewer", "📜")
+    """Render the complete Document Library page."""
+    setup_page("Library", "📚")
     init_session()
     render_sidebar()
     
-    page_header("📜 Markdown Viewer", "Browse and preview your converted Markdown files")
+    page_header("📚 Document Library", "Browse, inspect, and export your converted documents")
     
     # Two-column layout
     col_browser, col_preview = st.columns([1, 3])
