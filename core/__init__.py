@@ -1,0 +1,3 @@
+"""
+TeXify Studio - Core Package
+"""
