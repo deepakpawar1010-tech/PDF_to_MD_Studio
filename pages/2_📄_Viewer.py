@@ -26,7 +26,8 @@ from core.session_manager import SessionManager, init_session
 from core.ui_helpers import (
     apply_custom_css,
     download_button,
-    page_header,
+    render_html,
+    render_page_header,
     render_markdown_with_math,
     render_sidebar,
     setup_page,
@@ -48,13 +49,15 @@ def extract_math_formulas(text: str):
 
 def render_viewer_page() -> None:
     """Render the complete Markdown & KaTeX Document Viewer."""
-    setup_page("Viewer", "📜")
+    setup_page("Viewer", "📄")
     init_session()
+    apply_custom_css()
     render_sidebar()
 
-    page_header(
-        "📜 Markdown & KaTeX Viewer",
-        "Open, inspect, search, and edit any Markdown document with 100% KaTeX math rendering and Mathpix copy",
+    render_page_header(
+        icon="📄",
+        title="Markdown & KaTeX Viewer",
+        subtitle="Open, inspect, search, and edit any Markdown document with 100% KaTeX math rendering and Mathpix copy.",
     )
 
     # Top file-loading options

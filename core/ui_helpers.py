@@ -172,8 +172,8 @@ def apply_custom_css() -> None:
         }}
 
         /* Top Brand Header in Sidebar Navigation */
-        [data-testid="stSidebarNav"]::before {{
-            content: "⚡  TeXify Studio\\A LaTeX • Markdown • AI";
+        [data-testid="stSidebarNav"]::before {
+            content: "⚡  TeXify Studio\\A v2.0.0";
             white-space: pre-wrap;
             display: block;
             font-weight: 800;
@@ -183,62 +183,62 @@ def apply_custom_css() -> None:
             margin-bottom: 0.6rem;
             border-bottom: 1px solid #E2E8F0;
             line-height: 1.25;
-        }}
+        }
 
         /* Sidebar Navigation Labels - Exact Match to Design */
         [data-testid="stSidebarNav"] ul li:nth-child(1) a span,
         [data-testid="stSidebarNavLink"][href="/"] span,
-        [data-testid="stSidebarNavLink"][href=""] span {{
+        [data-testid="stSidebarNavLink"][href=""] span {
             display: none !important;
-        }}
+        }
         [data-testid="stSidebarNav"] ul li:nth-child(1) a::after,
         [data-testid="stSidebarNavLink"][href="/"]::after,
-        [data-testid="stSidebarNavLink"][href=""]::after {{
+        [data-testid="stSidebarNavLink"][href=""]::after {
             content: "🏠  Home" !important;
             font-weight: 600 !important;
             font-size: 0.92rem !important;
             color: inherit !important;
-        }}
+        }
 
-        [data-testid="stSidebarNav"] ul li:nth-child(2) a span {{
+        [data-testid="stSidebarNav"] ul li:nth-child(2) a span {
             display: none !important;
-        }}
-        [data-testid="stSidebarNav"] ul li:nth-child(2) a::after {{
-            content: "⚡  Conversion Studio" !important;
+        }
+        [data-testid="stSidebarNav"] ul li:nth-child(2) a::after {
+            content: "⚡  Studio" !important;
             font-weight: 600 !important;
             font-size: 0.92rem !important;
             color: inherit !important;
-        }}
+        }
 
-        [data-testid="stSidebarNav"] ul li:nth-child(3) a span {{
+        [data-testid="stSidebarNav"] ul li:nth-child(3) a span {
             display: none !important;
-        }}
-        [data-testid="stSidebarNav"] ul li:nth-child(3) a::after {{
+        }
+        [data-testid="stSidebarNav"] ul li:nth-child(3) a::after {
             content: "📄  Viewer" !important;
             font-weight: 600 !important;
             font-size: 0.92rem !important;
             color: inherit !important;
-        }}
+        }
 
-        [data-testid="stSidebarNav"] ul li:nth-child(4) a span {{
+        [data-testid="stSidebarNav"] ul li:nth-child(4) a span {
             display: none !important;
-        }}
-        [data-testid="stSidebarNav"] ul li:nth-child(4) a::after {{
+        }
+        [data-testid="stSidebarNav"] ul li:nth-child(4) a::after {
             content: "⚙️  Settings" !important;
             font-weight: 600 !important;
             font-size: 0.92rem !important;
             color: inherit !important;
-        }}
+        }
 
-        [data-testid="stSidebarNav"] ul li:nth-child(5) a span {{
+        [data-testid="stSidebarNav"] ul li:nth-child(5) a span {
             display: none !important;
-        }}
-        [data-testid="stSidebarNav"] ul li:nth-child(5) a::after {{
+        }
+        [data-testid="stSidebarNav"] ul li:nth-child(5) a::after {
             content: "📖  About" !important;
             font-weight: 600 !important;
             font-size: 0.92rem !important;
             color: inherit !important;
-        }}
+        }
 
         /* Sleek modern sidebar navigation items */
         [data-testid="stSidebarNav"] {{
@@ -362,23 +362,76 @@ def apply_custom_css() -> None:
             color: var(--text-secondary);
         }}
 
-        /* Tabs */
-        .stTabs [data-baseweb="tab-list"] {{
-            gap: 0.5rem;
-            border-bottom: 1px solid var(--border);
-        }}
-        .stTabs [data-baseweb="tab"] {{
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-            font-weight: 600;
-            color: var(--text-secondary);
-            padding: 0.6rem 1.2rem;
-            transition: all 0.2s ease;
-        }}
-        .stTabs [aria-selected="true"] {{
-            color: var(--accent) !important;
-            border-bottom: 2px solid var(--accent);
-            background: var(--accent-soft);
-        }}
+        /* Modern Segmented Tabs (matches Settings mockup media_1790762538192.png) */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 0.35rem !important;
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 12px !important;
+            padding: 4px 6px !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+        }
+        .stTabs [data-baseweb="tab-highlight"],
+        .stTabs [data-baseweb="tab-border"] {
+            display: none !important;
+        }
+        .stTabs [data-baseweb="tab"] {
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            color: #64748B !important;
+            padding: 0.45rem 1rem !important;
+            transition: all 0.15s ease !important;
+            border: none !important;
+            background: transparent !important;
+            height: auto !important;
+        }
+        .stTabs [data-baseweb="tab"]:hover {
+            color: #0F172A !important;
+            background: #F8FAFC !important;
+        }
+        .stTabs [aria-selected="true"] {
+            color: #4F46E5 !important;
+            background: #EEF2FF !important;
+            font-weight: 700 !important;
+        }
+
+        /* Segmented Control / Pill Group */
+        [data-testid="stSegmentedControl"] {
+            background: #F8FAFC !important;
+            border-radius: 10px !important;
+            padding: 3px !important;
+            border: 1px solid #E2E8F0 !important;
+        }
+        [data-testid="stSegmentedControl"] button {
+            border-radius: 8px !important;
+            border: none !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            color: #64748B !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        [data-testid="stSegmentedControl"] button[aria-checked="true"],
+        [data-testid="stSegmentedControl"] button[data-checked="true"] {
+            background: #FFFFFF !important;
+            color: #4F46E5 !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+            font-weight: 700 !important;
+        }
+
+        /* File uploader button */
+        [data-testid="stFileUploaderDropzone"] button {
+            background: #4F46E5 !important;
+            color: #FFFFFF !important;
+            border-radius: 8px !important;
+            font-weight: 700 !important;
+            border: none !important;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3) !important;
+        }
+        [data-testid="stFileUploaderDropzone"] button:hover {
+            background: #4338CA !important;
+            color: #FFFFFF !important;
+        }
 
         /* Text inputs / selects */
         .stTextInput input, .stSelectbox [data-baseweb="select"], .stNumberInput input {{
@@ -1493,6 +1546,37 @@ def page_header(title: str, subtitle: Optional[str] = None) -> None:
     if subtitle:
         st.markdown(f"*{subtitle}*")
     st.markdown("---")
+
+
+def render_page_header(
+    icon: str,
+    title: str,
+    subtitle: Optional[str] = None,
+    badge_html: Optional[str] = None,
+) -> None:
+    """
+    Display a SaaS-styled modern page header matching the reference mockups.
+    Features a purple rounded icon box, bold title, subtitle, and optional right-aligned badge.
+    """
+    badge_part = f"<div>{badge_html}</div>" if badge_html else ""
+    sub_part = f'<div style="font-size: 0.92rem; color: #64748B; margin-top: 0.2rem; line-height: 1.4;">{subtitle}</div>' if subtitle else ""
+    header_html = f"""
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0.4rem 0 1.25rem 0; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.9rem;">
+            <div style="width: 46px; height: 46px; border-radius: 12px; background: #EEF2FF; border: 1px solid #E0E7FF; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; flex-shrink: 0; color: #6366F1; box-shadow: 0 1px 3px rgba(99, 102, 241, 0.08);">
+                {icon}
+            </div>
+            <div>
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: #0F172A; margin: 0; line-height: 1.2; letter-spacing: -0.025em;">
+                    {title}
+                </h1>
+                {sub_part}
+            </div>
+        </div>
+        {badge_part}
+    </div>
+    """
+    render_html(header_html)
 
 
 # =============================================================================
