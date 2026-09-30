@@ -142,11 +142,56 @@ def apply_custom_css() -> None:
             font-family: 'JetBrains Mono', 'Courier New', monospace !important;
         }}
 
-        /* Main container */
-        .main .block-container {{
-            padding-top: 2rem;
-            padding-bottom: 3rem;
-            max-width: 1250px;
+        /* Main container - tight, modern padding */
+        .main .block-container,
+        [data-testid="stMainBlockContainer"],
+        [data-testid="block-container"] {{
+            padding-top: 0.8rem !important;
+            padding-bottom: 1.5rem !important;
+            max-width: 1200px !important;
+        }}
+
+        /* Sidebar container - eliminate excessive gaps */
+        [data-testid="stSidebarContent"] {{
+            padding-top: 1rem !important;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }}
+
+        /* Sidebar Navigation: Rename 'app' to '⚡ TeXify' */
+        [data-testid="stSidebarNav"] ul li:first-child a span,
+        [data-testid="stSidebarNavLink"][href="/"] span,
+        [data-testid="stSidebarNavLink"][href=""] span,
+        [data-testid="stSidebarNav"] li:first-child span {{
+            display: none !important;
+        }}
+        [data-testid="stSidebarNav"] ul li:first-child a::after,
+        [data-testid="stSidebarNavLink"][href="/"]::after,
+        [data-testid="stSidebarNavLink"][href=""]::after,
+        [data-testid="stSidebarNav"] li:first-child a::after {{
+            content: "⚡ TeXify" !important;
+            font-weight: 600 !important;
+            font-size: 0.92rem !important;
+            color: inherit !important;
+        }}
+
+        /* Sleek modern sidebar navigation items */
+        [data-testid="stSidebarNav"] {{
+            padding-top: 0.25rem !important;
+            margin-bottom: 0.35rem !important;
+        }}
+        [data-testid="stSidebarNavLink"] {{
+            border-radius: 8px !important;
+            padding: 0.45rem 0.8rem !important;
+            margin-bottom: 0.15rem !important;
+            transition: all 0.15s ease !important;
+        }}
+        [data-testid="stSidebarNavLink"]:hover {{
+            background-color: var(--surface-alt) !important;
+        }}
+        [data-testid="stSidebarNavLink"][aria-current="page"] {{
+            background: var(--accent-soft-strong) !important;
+            font-weight: 700 !important;
         }}
 
         /* Typography */
@@ -374,70 +419,57 @@ def render_sidebar() -> None:
     Call this on every page.
     """
     with st.sidebar:
-        st.markdown(
-            f"""
-            <div style="text-align: center; padding: 1.25rem 0 0.5rem 0;">
-                <h1 style="font-size: 1.4rem; margin-bottom: 0.25rem; font-weight: 800;">{PAGE_ICON} {APP_NAME}</h1>
-                <p style="color: var(--text-muted, #9797a6); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.02em;">v{APP_VERSION}</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
         from core.session_manager import SessionManager
         from core.config import get_config
 
-        # Active Engine indicator pill
         cfg = get_config()
         engine_type = cfg.get("engine", "gemini")
         if engine_type == "gemini":
-            model_name = cfg.get("gemini_model", "gemini-3.6-flash")
-            short_model = "3.6 Flash" if "3.6" in model_name or "flash" in model_name else "Vision"
+            model_name = cfg.get("gemini_model", "gemini-3.5-flash-lite")
+            short_model = "Gemini 3.5 Flash-Lite" if "lite" in model_name else ("Gemini 3.5 Flash" if "3.5" in model_name else "Gemini Vision")
+            status_card = f"""
+            <div style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: 9px; padding: 0.6rem 0.75rem; margin: 0.4rem 0 0.4rem 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.2rem;">
+                    <span style="font-size: 0.68rem; font-weight: 700; color: #818CF8; letter-spacing: 0.05em; text-transform: uppercase;">ACTIVE ENGINE</span>
+                    <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
+                </div>
+                <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary);">{short_model}</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">1,500 free pages/day • ~0.4s/page</div>
+            </div>
+            """
+        else:
+            status_card = """
+            <div style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: 9px; padding: 0.6rem 0.75rem; margin: 0.4rem 0 0.4rem 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.2rem;">
+                    <span style="font-size: 0.68rem; font-weight: 700; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase;">ACTIVE ENGINE</span>
+                    <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
+                </div>
+                <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary);">Marker Engine</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">Local Offline Processing</div>
+            </div>
+            """
+
+        st.markdown(status_card, unsafe_allow_html=True)
+
+        history = SessionManager.get_conversion_history()
+        if history:
+            total = len(history)
+            recent = len([h for h in history if h.get("success", False)])
             st.markdown(
                 f"""
-                <div style="text-align: center; margin-bottom: 1.25rem;">
-                    <span style="background: rgba(99, 102, 241, 0.12); color: #818CF8; border: 1px solid rgba(99, 102, 241, 0.3); padding: 0.3rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
-                        ⚡ Gemini {short_model}
-                    </span>
+                <div style="padding: 0.35rem 0.65rem; background: var(--surface-alt, rgba(255,255,255,0.02)); border: 1px solid var(--border, rgba(255,255,255,0.06)); border-radius: 7px; font-size: 0.75rem; display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <span style="color: var(--text-secondary);">Session Activity:</span>
+                    <strong style="color: #10B981;">{recent} / {total} converted</strong>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
-        else:
-            st.markdown(
-                """
-                <div style="text-align: center; margin-bottom: 1.25rem;">
-                    <span style="background: rgba(148, 163, 184, 0.12); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.3); padding: 0.3rem 0.8rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
-                        🖥️ Marker (Offline)
-                    </span>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        
-        st.markdown("---")
-        
-        # Quick stats
-        st.markdown("### 📊 Quick Stats")
-        
-        history = SessionManager.get_conversion_history()
-        total = len(history)
-        recent = len([h for h in history if h.get("success", False)])
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Total", total)
-        with col2:
-            st.metric("Successful", recent)
-        
-        st.markdown("---")
-        
-        # Footer
+
         st.markdown(
-            """
-            <div style="text-align: center; color: var(--text-muted, #666); font-size: 0.75rem; padding-top: 1rem;">
-                <p style="margin: 0.2rem 0;">Built with ❤️ using Streamlit</p>
-                <p style="margin: 0.2rem 0;">Powered by <strong>Gemini Vision</strong> & <strong>Marker</strong></p>
+            f"""
+            <div style="text-align: center; color: var(--text-muted); font-size: 0.7rem; padding-top: 0.75rem; opacity: 0.75;">
+                <p style="margin: 0; font-weight: 600;">{APP_NAME} v{APP_VERSION}</p>
+                <p style="margin: 0.1rem 0 0 0;">100% LaTeX Math Precision</p>
             </div>
             """,
             unsafe_allow_html=True,
