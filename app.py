@@ -105,19 +105,19 @@ def render_home() -> None:
                 """
                 <div style="padding: 0.5rem 0.25rem;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                        <span style="font-size: 2rem;">📚</span>
-                        <span style="background: rgba(245, 158, 11, 0.12); color: #F59E0B; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px;">LIBRARY</span>
+                        <span style="font-size: 2rem;">📜</span>
+                        <span style="background: rgba(245, 158, 11, 0.12); color: #F59E0B; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px;">VIEWER</span>
                     </div>
-                    <h3 style="margin-top: 0; margin-bottom: 0.4rem; font-size: 1.2rem;">Document Library</h3>
+                    <h3 style="margin-top: 0; margin-bottom: 0.4rem; font-size: 1.2rem;">Markdown Viewer</h3>
                     <p style="color: var(--text-secondary, #888); font-size: 0.88rem; line-height: 1.5; min-height: 48px;">
-                        Explore previously converted documents, inspect rendered formulas, edit content, and export files.
+                        Open or paste any Markdown file with 100% KaTeX math rendering, in-document search, and Mathpix copy.
                     </p>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
-            if st.button("Open Library →", key="btn_library", use_container_width=True):
-                st.switch_page("pages/2_📚_Library.py")
+            if st.button("Open Viewer →", key="btn_viewer", use_container_width=True):
+                st.switch_page("pages/2_📜_Viewer.py")
 
     with col3:
         with st.container(border=True):

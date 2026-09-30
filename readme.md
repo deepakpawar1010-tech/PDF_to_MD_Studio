@@ -23,8 +23,8 @@ TeXify Studio is a production-ready document conversion platform designed to tra
   - Automatic model fallback ladder (`gemini-3.5-flash-lite` → `gemini-flash-lite-latest` → `gemini-3.1-flash-lite` → `gemini-3.5-flash`).
 - **🖥️ Offline Marker Engine**:
   - Local, offline conversion fallback powered by Vik Paruchuri's Marker engine.
-- **📚 Document Library**:
-  - Browse, inspect, edit, and export previously converted documents and extracted assets.
+- **📜 Markdown & KaTeX Viewer**:
+  - Open or paste any Markdown document directly from your computer with 100% KaTeX math rendering, in-document search, live editor, and formula inspector (zero cloud storage required).
 
 ---
 

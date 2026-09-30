@@ -887,7 +887,14 @@ def render_markdown_with_math(content: str, height: int = 700) -> None:
             <div class="viewer-tip">
                 <span>💡</span> <span>Select text or click any formula to copy <strong>LaTeX ($...$)</strong> like Mathpix</span>
             </div>
-            <button id="btn-copy-all" class="toolbar-btn" onclick="copyFullDocument()">📋 Copy Markdown</button>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.6rem;">
+                    <span style="font-size: 0.8rem; opacity: 0.6;">🔍</span>
+                    <input id="doc-search-box" type="text" placeholder="Search in doc..." oninput="handleDocSearch(this.value)" style="background: transparent; border: none; color: var(--text); font-size: 0.8rem; outline: none; width: 130px;" />
+                    <span id="search-counter" style="font-size: 0.72rem; color: var(--text); opacity: 0.6; min-width: 35px; text-align: right;"></span>
+                </div>
+                <button id="btn-copy-all" class="toolbar-btn" onclick="copyFullDocument()">📋 Copy Markdown</button>
+            </div>
         </div>
 
         <div id="md-math-root">
@@ -935,7 +942,67 @@ def render_markdown_with_math(content: str, height: int = 700) -> None:
                 throwOnError: false
             }});
 
-            // 5. Mathpix-like Copy Handler: Intercept selection copy (Ctrl+C / Right click -> Copy)
+            // 5. In-document Search Handler
+            function handleDocSearch(term) {{
+                const container = document.getElementById('md-math-content');
+                const counter = document.getElementById('search-counter');
+                
+                // Clear previous highlights
+                const existingMarks = container.querySelectorAll('.doc-search-highlight');
+                existingMarks.forEach(function(m) {{
+                    const parent = m.parentNode;
+                    parent.replaceChild(document.createTextNode(m.textContent), m);
+                    parent.normalize();
+                }});
+                
+                if (!term || term.trim().length === 0) {{
+                    counter.textContent = '';
+                    return;
+                }}
+                
+                const query = term.trim().toLowerCase();
+                let count = 0;
+                
+                function highlightInNode(node) {{
+                    if (node.nodeType === Node.TEXT_NODE) {{
+                        const val = node.nodeValue;
+                        const lower = val.toLowerCase();
+                        let idx = lower.indexOf(query);
+                        if (idx !== -1) {{
+                            const frag = document.createDocumentFragment();
+                            let lastIdx = 0;
+                            while (idx !== -1) {{
+                                count++;
+                                frag.appendChild(document.createTextNode(val.substring(lastIdx, idx)));
+                                const mark = document.createElement('mark');
+                                mark.className = 'doc-search-highlight';
+                                mark.style.backgroundColor = 'rgba(234, 179, 8, 0.45)';
+                                mark.style.color = 'inherit';
+                                mark.style.borderRadius = '3px';
+                                mark.style.padding = '0 2px';
+                                mark.appendChild(document.createTextNode(val.substring(idx, idx + query.length)));
+                                frag.appendChild(mark);
+                                lastIdx = idx + query.length;
+                                idx = lower.indexOf(query, lastIdx);
+                            }}
+                            frag.appendChild(document.createTextNode(val.substring(lastIdx)));
+                            node.parentNode.replaceChild(frag, node);
+                        }}
+                    }} else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE' && node.className !== 'doc-search-highlight') {{
+                        Array.from(node.childNodes).forEach(highlightInNode);
+                    }}
+                }}
+                
+                highlightInNode(container);
+                counter.textContent = count > 0 ? (count + (count === 1 ? ' match' : ' matches')) : '0 found';
+                
+                const firstMark = container.querySelector('.doc-search-highlight');
+                if (firstMark) {{
+                    firstMark.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+                }}
+            }}
+
+            // 6. Mathpix-like Copy Handler: Intercept selection copy (Ctrl+C / Right click -> Copy)
             // Replaces rendered KaTeX elements with pure LaTeX code ($...$ / $$...$$)
             (function setupCopyTex() {{
                 const copyDelimiters = {{
@@ -1060,6 +1127,56 @@ def render_markdown_with_math(content: str, height: int = 700) -> None:
         f'frameborder="0"></iframe>',
         unsafe_allow_html=True,
     )
+
+
+def trigger_auto_download(content: str, filename: str) -> None:
+    """
+    Trigger automatic client-side browser download of the converted Markdown file
+    using a base64 data-URL / blob download iframe.
+    """
+    import base64
+    import json
+    import streamlit.components.v1 as components
+
+    b64_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+    safe_filename = json.dumps(filename)
+
+    dl_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <script>
+        (function() {{
+            try {{
+                const b64 = "{b64_content}";
+                const filename = {safe_filename};
+                const byteCharacters = atob(b64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {{
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }}
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], {{ type: 'text/markdown;charset=utf-8' }});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function() {{
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }}, 1500);
+            }} catch (e) {{
+                console.error("Auto-download trigger failed:", e);
+            }}
+        }})();
+    </script>
+    </body>
+    </html>
+    """
+    components.html(dl_html, height=0, width=0)
 
 
 def show_success(message: str, details: Optional[str] = None) -> None:

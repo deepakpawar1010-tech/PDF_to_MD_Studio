@@ -46,7 +46,7 @@ def render_about_section() -> None:
         ("🧮 100% LaTeX Math Accuracy", "Flawless formatting for formulas, subscripts, superscripts, combinations, fractions, and matrices ($...$ and $$...$$)."),
         ("📋 Mathpix-Style LaTeX Copy", "Highlight text or click any formula in the rendered preview to copy pure LaTeX source code directly to your clipboard."),
         ("🔍 50:50 Side-by-Side Studio", "Inspect your original PDF and rendered Markdown side-by-side with full column width and synchronized review."),
-        ("📚 Document Library", "Browse, search, edit, and export your converted documents and extracted assets anytime."),
+        ("📜 Markdown & KaTeX Viewer", "Open, search, edit, and inspect any Markdown document with 100% KaTeX math rendering and formula inspector."),
         ("🖥️ Offline Marker Fallback", "100% local, offline conversion fallback powered by the Marker engine."),
     ]
     

@@ -37,6 +37,7 @@ from core.ui_helpers import (
     show_error,
     show_success,
     show_warning,
+    trigger_auto_download,
 )
 from core.marker_engine import CONVERSION_STAGES
 
@@ -185,6 +186,14 @@ def handle_single_conversion(
         
         if success and output_path:
             show_success("Conversion Complete!", message)
+            
+            # Automatically download the converted markdown to user's computer
+            try:
+                with open(output_path, "r", encoding="utf-8") as f_dl:
+                    md_dl_content = f_dl.read()
+                trigger_auto_download(md_dl_content, Path(output_path).name)
+            except Exception as e_dl:
+                logger.warning(f"Auto-download trigger failed: {e_dl}")
             
             st.markdown("### 📄 Result")
             col1, col2 = st.columns([2, 1])
