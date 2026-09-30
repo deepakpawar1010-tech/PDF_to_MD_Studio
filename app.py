@@ -43,55 +43,145 @@ def render_home() -> None:
     current_model = cfg.get("gemini_model", "gemini-3.5-flash-lite")
     short_model = "Gemini 3.5 Flash-Lite" if "lite" in current_model else ("Gemini 3.5 Flash" if "3.5" in current_model else "Gemini Vision")
 
-    # Tight, modern SaaS Hero Section
+    # =========================================================================
+    # HERO SECTION (2-Column Layout matching media_1790760964862.png)
+    # =========================================================================
     st.markdown(
         f"""
-        <div style="text-align: center; padding: 0.5rem 0.5rem 0.75rem 0.5rem; max-width: 820px; margin: 0 auto;">
-            <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); padding: 0.25rem 0.8rem; border-radius: 9999px; margin-bottom: 0.65rem;">
-                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981; display: inline-block;"></span>
-                <span style="font-size: 0.76rem; font-weight: 700; color: #818CF8; letter-spacing: 0.05em; text-transform: uppercase;">
-                    ⚡ {APP_NAME} v{APP_VERSION} • MATH VISION AI
-                </span>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0.2rem 0 1rem 0; flex-wrap: wrap;">
+            <!-- LEFT COLUMN: Headline & Features -->
+            <div style="flex: 1 1 520px; max-width: 580px;">
+                <!-- Engine Pill Badge -->
+                <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: #EEF2FF; border: 1px solid #E0E7FF; padding: 0.28rem 0.85rem; border-radius: 9999px; margin-bottom: 0.85rem;">
+                    <span style="color: #6366F1; font-size: 0.9rem; font-weight: 800;">⚡</span>
+                    <span style="font-size: 0.78rem; font-weight: 700; color: #4F46E5;">Powered by {short_model if current_engine == 'gemini' else 'Marker Engine'}</span>
+                </div>
+                
+                <!-- Main Heading -->
+                <h1 style="font-size: 2.75rem; font-weight: 900; line-height: 1.15; margin: 0 0 0.85rem 0; letter-spacing: -0.03em; color: #0F172A;">
+                    Turn Complex PDFs into<br>
+                    <span style="background: linear-gradient(135deg, #4338CA 0%, #6366F1 45%, #A855F7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Flawless Markdown</span>
+                </h1>
+                
+                <!-- Subtitle -->
+                <p style="font-size: 0.98rem; color: #64748B; line-height: 1.55; margin: 0 0 1.25rem 0; max-width: 520px;">
+                    High-precision document conversion with 100% accurate LaTeX math, side-by-side 50:50 comparison, instant Mathpix equation copying, and automatic download.
+                </p>
+                
+                <!-- 5 Feature Badges Row -->
+                <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+                    <span style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: inline-flex; align-items: center; gap: 0.35rem;">
+                        🎯 100% LaTeX Precision
+                    </span>
+                    <span style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: inline-flex; align-items: center; gap: 0.35rem;">
+                        ⚡ ~0.4s per page
+                    </span>
+                    <span style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: inline-flex; align-items: center; gap: 0.35rem;">
+                        📋 Mathpix-Style Copy
+                    </span>
+                    <span style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: inline-flex; align-items: center; gap: 0.35rem;">
+                        📥 Auto-Download
+                    </span>
+                    <span style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: inline-flex; align-items: center; gap: 0.35rem;">
+                        🔒 AI Powered (Gemini)
+                    </span>
+                </div>
             </div>
-            <h1 style="font-size: 2.35rem; font-weight: 800; line-height: 1.16; margin: 0 0 0.5rem 0; letter-spacing: -0.03em;">
-                Turn Complex PDFs into <span style="background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Flawless Markdown</span>
-            </h1>
-            <p style="font-size: 1.02rem; color: var(--text-secondary, #94A3B8); line-height: 1.5; margin: 0 auto 0.85rem auto; max-width: 680px;">
-                High-precision document conversion with 100% accurate LaTeX math, side-by-side 50:50 comparison, instant Mathpix equation copying, and automatic download.
-            </p>
-            <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-                <span style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); padding: 0.25rem 0.75rem; border-radius: 7px; font-size: 0.78rem; color: var(--text-secondary, #aaa);">
-                    ⚡ Active AI: <strong style="color: {'#818CF8' if current_engine == 'gemini' else '#10B981'};">{short_model if current_engine == 'gemini' else 'Marker (Offline)'}</strong>
-                </span>
-                <span style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); padding: 0.25rem 0.75rem; border-radius: 7px; font-size: 0.78rem; color: var(--text-secondary, #aaa);">
-                    🧮 LaTeX Math: <strong style="color: #10B981;">100% Precision ($...$)</strong>
-                </span>
-                <span style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); padding: 0.25rem 0.75rem; border-radius: 7px; font-size: 0.78rem; color: var(--text-secondary, #aaa);">
-                    ⏱️ Speed: <strong style="color: #6366F1;">~0.4s / page</strong>
-                </span>
-                <span style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); padding: 0.25rem 0.75rem; border-radius: 7px; font-size: 0.78rem; color: var(--text-secondary, #aaa);">
-                    📥 Auto-Download: <strong style="color: #EC4899;">Enabled</strong>
-                </span>
+            
+            <!-- RIGHT COLUMN: Graphic Illustration (PDF to Markdown conversion) -->
+            <div style="flex: 1 1 380px; max-width: 470px; min-width: 320px; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 0.5rem;">
+                <!-- Ambient radial background glow -->
+                <div style="position: absolute; width: 340px; height: 260px; background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 75%); border-radius: 50%; pointer-events: none;"></div>
+                
+                <!-- Floating Sparkle Icon Badge -->
+                <div style="position: absolute; top: -4px; right: 55px; width: 32px; height: 32px; border-radius: 50%; background: #F5F3FF; border: 1px solid #DDD6FE; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2); font-size: 1rem; color: #9333EA; z-index: 6;">
+                    ✨
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: center; position: relative; width: 100%;">
+                    <!-- LEFT CARD: PDF Preview -->
+                    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); padding: 13px 14px; width: 185px; transform: rotate(-3.5deg); position: relative; z-index: 1;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="background: #EF4444; color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 5px; letter-spacing: 0.04em;">PDF</span>
+                            <div style="display: flex; flex-direction: column; gap: 3px; align-items: flex-end;">
+                                <span style="width: 32px; height: 3px; background: #E2E8F0; border-radius: 2px;"></span>
+                                <span style="width: 22px; height: 3px; background: #E2E8F0; border-radius: 2px;"></span>
+                            </div>
+                        </div>
+                        
+                        <div style="font-family: 'Times New Roman', serif; font-size: 1.15rem; font-style: italic; color: #0F172A; text-align: center; margin: 10px 0 8px 0; letter-spacing: 0.03em;">
+                            ∫<sub>-∞</sub><sup>∞</sup> e<sup>-x²</sup> dx
+                        </div>
+                        
+                        <!-- Gaussian Bell Curve Plot -->
+                        <div style="background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 8px; padding: 6px 4px 4px 4px; margin-top: 4px;">
+                            <svg viewBox="0 0 140 60" style="width: 100%; height: 48px; display: block;">
+                                <defs>
+                                    <linearGradient id="pdfCurveGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.25"/>
+                                        <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.02"/>
+                                    </linearGradient>
+                                </defs>
+                                <line x1="8" y1="52" x2="132" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+                                <line x1="70" y1="8" x2="70" y2="52" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="2,2"/>
+                                <path d="M 12 51 C 42 51, 54 14, 70 14 C 86 14, 98 51, 128 51 Z" fill="url(#pdfCurveGrad)"/>
+                                <path d="M 12 51 C 42 51, 54 14, 70 14 C 86 14, 98 51, 128 51" fill="none" stroke="#3B82F6" stroke-width="1.8"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- CENTER CONVERSION ARROW BUTTON -->
+                    <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #6366F1, #8B5CF6); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.45); color: #FFFFFF; font-size: 1.15rem; font-weight: bold; z-index: 5; margin: 0 -16px; border: 2px solid #FFFFFF; flex-shrink: 0;">
+                        →
+                    </div>
+
+                    <!-- RIGHT CARD: Markdown Preview -->
+                    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 16px 36px rgba(99,102,241,0.14); padding: 13px 14px; width: 205px; transform: rotate(3deg); position: relative; z-index: 3;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="background: #4F46E5; color: #FFFFFF; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 5px;">Markdown</span>
+                            <span style="background: #2563EB; color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 5px; font-family: monospace;">M↓</span>
+                        </div>
+                        
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; line-height: 1.5; color: #1E293B;">
+                            <div style="font-weight: 700; color: #0F172A;"># Gaussian Integral</div>
+                            <div style="color: #64748B; font-size: 0.64rem; margin: 2px 0; word-break: break-all;">\\int_{{-\\infty}}^{{\\infty}} e^{{-x^2}} dx</div>
+                            
+                            <div style="background: #F8FAFC; border: 1px solid #EEF2FF; border-radius: 6px; padding: 4px; margin: 4px 0;">
+                                <svg viewBox="0 0 140 45" style="width: 100%; height: 32px; display: block;">
+                                    <path d="M 12 40 C 42 40, 54 10, 70 10 C 86 10, 98 40, 128 40" fill="none" stroke="#6366F1" stroke-width="1.8"/>
+                                </svg>
+                            </div>
+                            
+                            <div style="color: #7C3AED; font-weight: 600; font-size: 0.63rem;">![plot](figure1.png)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # 3 Main Workspaces (Studio, Viewer, Settings)
-    col1, col2, col3 = st.columns(3, gap="small")
+    # =========================================================================
+    # 3 MAIN WORKSPACE CARDS (Studio, Viewer, Settings)
+    # =========================================================================
+    col1, col2, col3 = st.columns(3, gap="medium")
 
     with col1:
         with st.container(border=True):
             st.markdown(
                 """
-                <div style="padding: 0.2rem 0.1rem 0.4rem 0.1rem;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="font-size: 1.5rem;">⚡</span>
-                        <span style="background: rgba(99, 102, 241, 0.12); color: #818CF8; font-size: 0.7rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 9999px; letter-spacing: 0.04em;">STUDIO</span>
+                <div style="padding: 0.25rem 0.1rem 0.4rem 0.1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <div style="width: 42px; height: 42px; border-radius: 12px; background: #F5F3FF; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: #7C3AED;">
+                            ⚡
+                        </div>
+                        <span style="background: #EEF2FF; color: #6366F1; font-size: 0.7rem; font-weight: 700; padding: 0.22rem 0.65rem; border-radius: 9999px; letter-spacing: 0.04em;">
+                            STUDIO
+                        </span>
                     </div>
-                    <h3 style="margin: 0 0 0.35rem 0; font-size: 1.15rem; font-weight: 700;">Conversion Studio</h3>
-                    <p style="color: var(--text-secondary, #888); font-size: 0.85rem; line-height: 1.45; min-height: 48px; margin: 0 0 0.5rem 0;">
+                    <h3 style="margin: 0 0 0.4rem 0; font-size: 1.18rem; font-weight: 800; color: #0F172A;">Conversion Studio</h3>
+                    <p style="color: #64748B; font-size: 0.85rem; line-height: 1.48; min-height: 50px; margin: 0 0 0.75rem 0;">
                         Upload PDFs, convert in seconds, and review with 50:50 side-by-side comparison & Mathpix-style LaTeX copy.
                     </p>
                 </div>
@@ -105,13 +195,17 @@ def render_home() -> None:
         with st.container(border=True):
             st.markdown(
                 """
-                <div style="padding: 0.2rem 0.1rem 0.4rem 0.1rem;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="font-size: 1.5rem;">📜</span>
-                        <span style="background: rgba(245, 158, 11, 0.12); color: #F59E0B; font-size: 0.7rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 9999px; letter-spacing: 0.04em;">VIEWER</span>
+                <div style="padding: 0.25rem 0.1rem 0.4rem 0.1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <div style="width: 42px; height: 42px; border-radius: 12px; background: #FFFBEB; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: #D97706;">
+                            📄
+                        </div>
+                        <span style="background: #FEF3C7; color: #D97706; font-size: 0.7rem; font-weight: 700; padding: 0.22rem 0.65rem; border-radius: 9999px; letter-spacing: 0.04em;">
+                            VIEWER
+                        </span>
                     </div>
-                    <h3 style="margin: 0 0 0.35rem 0; font-size: 1.15rem; font-weight: 700;">Markdown Viewer</h3>
-                    <p style="color: var(--text-secondary, #888); font-size: 0.85rem; line-height: 1.45; min-height: 48px; margin: 0 0 0.5rem 0;">
+                    <h3 style="margin: 0 0 0.4rem 0; font-size: 1.18rem; font-weight: 800; color: #0F172A;">Markdown Viewer</h3>
+                    <p style="color: #64748B; font-size: 0.85rem; line-height: 1.48; min-height: 50px; margin: 0 0 0.75rem 0;">
                         Open or paste any Markdown file with KaTeX math rendering, in-document search, and Mathpix equation copy.
                     </p>
                 </div>
@@ -125,13 +219,17 @@ def render_home() -> None:
         with st.container(border=True):
             st.markdown(
                 """
-                <div style="padding: 0.2rem 0.1rem 0.4rem 0.1rem;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span style="font-size: 1.5rem;">⚙️</span>
-                        <span style="background: rgba(139, 92, 246, 0.12); color: #8B5CF6; font-size: 0.7rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 9999px; letter-spacing: 0.04em;">CONFIG</span>
+                <div style="padding: 0.25rem 0.1rem 0.4rem 0.1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <div style="width: 42px; height: 42px; border-radius: 12px; background: #EFF6FF; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: #2563EB;">
+                            ⚙️
+                        </div>
+                        <span style="background: #DBEAFE; color: #2563EB; font-size: 0.7rem; font-weight: 700; padding: 0.22rem 0.65rem; border-radius: 9999px; letter-spacing: 0.04em;">
+                            CONFIG
+                        </span>
                     </div>
-                    <h3 style="margin: 0 0 0.35rem 0; font-size: 1.15rem; font-weight: 700;">Studio Settings</h3>
-                    <p style="color: var(--text-secondary, #888); font-size: 0.85rem; line-height: 1.45; min-height: 48px; margin: 0 0 0.5rem 0;">
+                    <h3 style="margin: 0 0 0.4rem 0; font-size: 1.18rem; font-weight: 800; color: #0F172A;">Studio Settings</h3>
+                    <p style="color: #64748B; font-size: 0.85rem; line-height: 1.48; min-height: 50px; margin: 0 0 0.75rem 0;">
                         Configure your Gemini API key, choose models, toggle dark/light theme, and adjust OCR preferences.
                     </p>
                 </div>
@@ -141,51 +239,96 @@ def render_home() -> None:
             if st.button("Open Settings →", key="btn_settings", use_container_width=True):
                 st.switch_page("pages/3_⚙️_Settings.py")
 
-    # Workflow Section - Full width 3-step pipeline
+    # =========================================================================
+    # BOTTOM WORKFLOW PIPELINE (3-Step Pipeline matching mockup)
+    # =========================================================================
     with st.container(border=True):
         st.markdown(
-            f"""
-            <div style="padding: 0.25rem 0.25rem;">
-                <div style="font-size: 0.75rem; font-weight: 700; color: #818CF8; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.75rem;">
-                    ⚡ 3-STEP CONVERSION PIPELINE
+            """
+            <div style="padding: 0.35rem 0.35rem;">
+                <!-- Header Row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.45rem;">
+                        <span style="color: #6366F1; font-size: 1rem;">⚡</span>
+                        <span style="font-size: 0.76rem; font-weight: 800; color: #6366F1; letter-spacing: 0.06em; text-transform: uppercase;">
+                            3-STEP CONVERSION PIPELINE
+                        </span>
+                    </div>
+                    <span style="background: #EEF2FF; color: #6366F1; font-size: 0.72rem; font-weight: 700; padding: 0.22rem 0.75rem; border-radius: 9999px;">
+                        ⚡ Fast • Accurate • Automated
+                    </span>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
-                    <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                        <div style="background: rgba(99, 102, 241, 0.12); color: #818CF8; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">1</div>
+                
+                <!-- 3 Steps Grid with Connecting Arrows -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+                    
+                    <!-- STEP 1 -->
+                    <div style="flex: 1 1 240px; display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <div style="background: #EEF2FF; color: #6366F1; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 10px;">
+                            1
+                        </div>
+                        <div style="background: #EFF6FF; color: #2563EB; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
+                            📤
+                        </div>
                         <div>
-                            <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.2rem;">Drop Your PDF</div>
-                            <div style="color: var(--text-secondary, #888); font-size: 0.82rem; line-height: 1.45;">Upload worksheets, exam papers, textbooks, or scientific articles in the Studio.</div>
+                            <div style="font-weight: 800; font-size: 0.94rem; color: #0F172A; margin-bottom: 0.2rem;">Drop Your PDF</div>
+                            <div style="color: #64748B; font-size: 0.8rem; line-height: 1.45;">Upload worksheets, exam papers, textbooks, or scientific articles in the Studio.</div>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                        <div style="background: rgba(99, 102, 241, 0.12); color: #818CF8; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">2</div>
+
+                    <!-- ARROW 1 -->
+                    <div style="color: #CBD5E1; font-size: 1.3rem; font-weight: bold; padding: 0 0.2rem;">
+                        →
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div style="flex: 1 1 240px; display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <div style="background: #EEF2FF; color: #6366F1; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 10px;">
+                            2
+                        </div>
+                        <div style="background: #F5F3FF; color: #7C3AED; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
+                            📑
+                        </div>
                         <div>
-                            <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.2rem;">AI Vision OCR & KaTeX</div>
-                            <div style="color: var(--text-secondary, #888); font-size: 0.82rem; line-height: 1.45;">Gemini extracts equations, fractions, matrices, and tables with 100% LaTeX fidelity.</div>
+                            <div style="font-weight: 800; font-size: 0.94rem; color: #0F172A; margin-bottom: 0.2rem;">AI Vision OCR & KaTeX</div>
+                            <div style="color: #64748B; font-size: 0.8rem; line-height: 1.45;">Gemini extracts equations, fractions, matrices, and tables with 100% LaTeX fidelity.</div>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                        <div style="background: rgba(99, 102, 241, 0.12); color: #818CF8; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">3</div>
+
+                    <!-- ARROW 2 -->
+                    <div style="color: #CBD5E1; font-size: 1.3rem; font-weight: bold; padding: 0 0.2rem;">
+                        →
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div style="flex: 1 1 240px; display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <div style="background: #EEF2FF; color: #6366F1; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 10px;">
+                            3
+                        </div>
+                        <div style="background: #EFF6FF; color: #2563EB; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
+                            ✅
+                        </div>
                         <div>
-                            <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.2rem;">Side-by-Side Review & Auto-Save</div>
-                            <div style="color: var(--text-secondary, #888); font-size: 0.82rem; line-height: 1.45;">Inspect original PDF vs Markdown, click any math to copy LaTeX, and auto-download .md.</div>
+                            <div style="font-weight: 800; font-size: 0.94rem; color: #0F172A; margin-bottom: 0.2rem;">Side-by-Side Review & Auto-Save</div>
+                            <div style="color: #64748B; font-size: 0.8rem; line-height: 1.45;">Inspect original PDF vs Markdown, click any math to copy LaTeX, and auto-download .md.</div>
                         </div>
                     </div>
+
                 </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    # Activity Shelf (only shown when conversions exist in session, avoiding empty gray box)
+    # Activity Shelf (only shown when conversions exist in session)
     history = SessionManager.get_conversion_history()
     if history:
         with st.container(border=True):
             st.markdown(
                 """
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary);">📊 Recent Activity in this Session</span>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">Saved in memory</span>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">📊 Recent Activity in this Session</span>
+                    <span style="font-size: 0.75rem; color: #64748B;">Saved in memory</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -197,13 +340,13 @@ def render_home() -> None:
                 engine_used = record.get("engine", "gemini").capitalize()
                 st.markdown(
                     f"""
-                    <div style="padding: 0.45rem 0.7rem; background: var(--surface-hover, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.06)); border-radius: 7px; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="padding: 0.45rem 0.7rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 7px; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <span style="margin-right: 0.35rem;">{status_icon}</span>
-                            <strong style="font-size: 0.85rem;">{file_name}</strong>
-                            <span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 0.4rem;">({engine_used})</span>
+                            <strong style="font-size: 0.85rem; color: #0F172A;">{file_name}</strong>
+                            <span style="font-size: 0.72rem; color: #64748B; margin-left: 0.4rem;">({engine_used})</span>
                         </div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem;">{timestamp}</span>
+                        <span style="color: #64748B; font-size: 0.75rem;">{timestamp}</span>
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -212,7 +355,7 @@ def render_home() -> None:
     # Clean, tight SaaS footer
     st.markdown(
         f"""
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.72rem; padding: 0.75rem 0 0.5rem 0; margin-top: 0.75rem; border-top: 1px solid var(--border, rgba(255,255,255,0.06)); opacity: 0.8;">
+        <div style="text-align: center; color: #94A3B8; font-size: 0.72rem; padding: 0.75rem 0 0.5rem 0; margin-top: 0.75rem; border-top: 1px solid #E2E8F0; opacity: 0.85;">
             <span>{APP_NAME} v{APP_VERSION} • High-Fidelity Math & Document Intelligence</span>
             <span style="margin: 0 0.4rem;">•</span>
             <span>Powered by <strong>Google Gemini Vision</strong> & <strong>Marker</strong></span>

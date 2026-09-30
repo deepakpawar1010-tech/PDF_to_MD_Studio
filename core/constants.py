@@ -119,7 +119,7 @@ DEFAULT_SETTINGS = {
     "quality": "high",
     "timeout": DEFAULT_CONVERSION_TIMEOUT,
     "auto_cleanup": True,
-    "dark_mode": True,
+    "dark_mode": False,
 }
 
 # =============================================================================

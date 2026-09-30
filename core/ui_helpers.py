@@ -84,15 +84,15 @@ def apply_custom_css() -> None:
         }
     else:
         palette = {
-            "surface": "#FFFFFF",
-            "surface_alt": "#F8FAFC",
+            "surface": "#FBFBFE",
+            "surface_alt": "#FFFFFF",
             "border": "#E2E8F0",
             "text_primary": "#0F172A",
             "text_secondary": "#64748B",
             "text_muted": "#94A3B8",
-            "sidebar_bg": "#F1F5F9",
-            "shadow_sm": "0 1px 3px rgba(0, 0, 0, 0.05)",
-            "shadow_md": "0 6px 24px rgba(0, 0, 0, 0.08)",
+            "sidebar_bg": "#FAFAFD",
+            "shadow_sm": "0 1px 3px rgba(0, 0, 0, 0.04)",
+            "shadow_md": "0 8px 24px rgba(0, 0, 0, 0.06)",
             "code_bg": "#F8FAFC",
             "table_header_bg": "#F1F5F9",
         }
@@ -104,7 +104,7 @@ def apply_custom_css() -> None:
 
         :root {{
             --accent: {PRIMARY_COLOR};
-            --accent-gradient: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #D946EF 100%);
+            --accent-gradient: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             --accent-soft: rgba(99, 102, 241, 0.08);
             --accent-soft-strong: rgba(99, 102, 241, 0.16);
             --surface: {palette["surface"]};
@@ -126,7 +126,7 @@ def apply_custom_css() -> None:
         }}
         [data-testid="stSidebar"] {{
             background-color: {palette["sidebar_bg"]} !important;
-            border-right: 1px solid var(--border);
+            border-right: 1px solid var(--border) !important;
         }}
         [data-testid="stSidebar"] [data-testid="stMetricValue"] {{
             color: var(--accent);
@@ -148,28 +148,80 @@ def apply_custom_css() -> None:
         [data-testid="block-container"] {{
             padding-top: 0.8rem !important;
             padding-bottom: 1.5rem !important;
-            max-width: 1200px !important;
+            max-width: 1220px !important;
         }}
 
-        /* Sidebar container - eliminate excessive gaps */
+        /* Sidebar container - clean, sleek SaaS look */
         [data-testid="stSidebarContent"] {{
             padding-top: 1rem !important;
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
         }}
 
-        /* Sidebar Navigation: Rename 'app' to '⚡ TeXify' */
-        [data-testid="stSidebarNav"] ul li:first-child a span,
+        /* Top Brand Header in Sidebar Navigation */
+        [data-testid="stSidebarNav"]::before {{
+            content: "⚡  TeXify Studio\\A LaTeX • Markdown • AI";
+            white-space: pre-wrap;
+            display: block;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: #0F172A;
+            padding: 0.15rem 0.5rem 0.85rem 0.5rem;
+            margin-bottom: 0.6rem;
+            border-bottom: 1px solid #E2E8F0;
+            line-height: 1.25;
+        }}
+
+        /* Sidebar Navigation Labels - Exact Match to Design */
+        [data-testid="stSidebarNav"] ul li:nth-child(1) a span,
         [data-testid="stSidebarNavLink"][href="/"] span,
-        [data-testid="stSidebarNavLink"][href=""] span,
-        [data-testid="stSidebarNav"] li:first-child span {{
+        [data-testid="stSidebarNavLink"][href=""] span {{
             display: none !important;
         }}
-        [data-testid="stSidebarNav"] ul li:first-child a::after,
+        [data-testid="stSidebarNav"] ul li:nth-child(1) a::after,
         [data-testid="stSidebarNavLink"][href="/"]::after,
-        [data-testid="stSidebarNavLink"][href=""]::after,
-        [data-testid="stSidebarNav"] li:first-child a::after {{
-            content: "⚡ TeXify" !important;
+        [data-testid="stSidebarNavLink"][href=""]::after {{
+            content: "🏠  Home" !important;
+            font-weight: 600 !important;
+            font-size: 0.92rem !important;
+            color: inherit !important;
+        }}
+
+        [data-testid="stSidebarNav"] ul li:nth-child(2) a span {{
+            display: none !important;
+        }}
+        [data-testid="stSidebarNav"] ul li:nth-child(2) a::after {{
+            content: "⚡  Conversion Studio" !important;
+            font-weight: 600 !important;
+            font-size: 0.92rem !important;
+            color: inherit !important;
+        }}
+
+        [data-testid="stSidebarNav"] ul li:nth-child(3) a span {{
+            display: none !important;
+        }}
+        [data-testid="stSidebarNav"] ul li:nth-child(3) a::after {{
+            content: "📄  Viewer" !important;
+            font-weight: 600 !important;
+            font-size: 0.92rem !important;
+            color: inherit !important;
+        }}
+
+        [data-testid="stSidebarNav"] ul li:nth-child(4) a span {{
+            display: none !important;
+        }}
+        [data-testid="stSidebarNav"] ul li:nth-child(4) a::after {{
+            content: "⚙️  Settings" !important;
+            font-weight: 600 !important;
+            font-size: 0.92rem !important;
+            color: inherit !important;
+        }}
+
+        [data-testid="stSidebarNav"] ul li:nth-child(5) a span {{
+            display: none !important;
+        }}
+        [data-testid="stSidebarNav"] ul li:nth-child(5) a::after {{
+            content: "📖  About" !important;
             font-weight: 600 !important;
             font-size: 0.92rem !important;
             color: inherit !important;
@@ -178,19 +230,32 @@ def apply_custom_css() -> None:
         /* Sleek modern sidebar navigation items */
         [data-testid="stSidebarNav"] {{
             padding-top: 0.25rem !important;
-            margin-bottom: 0.35rem !important;
+            margin-bottom: 0.4rem !important;
         }}
         [data-testid="stSidebarNavLink"] {{
-            border-radius: 8px !important;
-            padding: 0.45rem 0.8rem !important;
-            margin-bottom: 0.15rem !important;
+            border-radius: 10px !important;
+            padding: 0.52rem 0.85rem !important;
+            margin-bottom: 0.2rem !important;
+            color: #475569 !important;
             transition: all 0.15s ease !important;
         }}
+        [data-testid="stSidebarNavLink"]::after {{
+            color: #475569 !important;
+        }}
         [data-testid="stSidebarNavLink"]:hover {{
-            background-color: var(--surface-alt) !important;
+            background-color: #F1F5F9 !important;
+            color: #0F172A !important;
+        }}
+        [data-testid="stSidebarNavLink"]:hover::after {{
+            color: #0F172A !important;
         }}
         [data-testid="stSidebarNavLink"][aria-current="page"] {{
-            background: var(--accent-soft-strong) !important;
+            background: #EEF2FF !important;
+            color: #4F46E5 !important;
+            font-weight: 700 !important;
+        }}
+        [data-testid="stSidebarNavLink"][aria-current="page"]::after {{
+            color: #4F46E5 !important;
             font-weight: 700 !important;
         }}
 
@@ -208,38 +273,44 @@ def apply_custom_css() -> None:
 
         /* Buttons */
         .stButton > button {{
-            border-radius: var(--radius-sm);
-            padding: 0.6rem 1.6rem;
-            font-weight: 600;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            border: 1px solid var(--border);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-sm);
+            border-radius: 10px !important;
+            padding: 0.6rem 1.4rem !important;
+            font-weight: 700 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            border: 1px solid #E2E8F0 !important;
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
         }}
         .stButton > button:hover {{
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--accent);
+            background-color: #F8FAFC !important;
+            border-color: #CBD5E1 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
         }}
         .stButton > button[kind="primary"] {{
-            background: var(--accent-gradient);
-            border: none;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%) !important;
+            border: none !important;
             color: #FFFFFF !important;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35) !important;
+            font-weight: 700 !important;
         }}
         .stButton > button[kind="primary"]:hover {{
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5) !important;
+            transform: translateY(-2px) !important;
         }}
 
         /* Bordered containers (st.container(border=True)) -> polished cards */
         [data-testid="stVerticalBlockBorderWrapper"] {{
-            border-radius: var(--radius-md) !important;
-            border: 1px solid var(--border) !important;
-            background-color: var(--surface-alt) !important;
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow 0.2s ease;
+            border-radius: 14px !important;
+            border: 1px solid #E2E8F0 !important;
+            background-color: #FFFFFF !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+            transition: all 0.2s ease !important;
         }}
+
+
 
         /* File uploader */
         [data-testid="stFileUploaderDropzone"] {{
@@ -428,24 +499,25 @@ def render_sidebar() -> None:
             model_name = cfg.get("gemini_model", "gemini-3.5-flash-lite")
             short_model = "Gemini 3.5 Flash-Lite" if "lite" in model_name else ("Gemini 3.5 Flash" if "3.5" in model_name else "Gemini Vision")
             status_card = f"""
-            <div style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: 9px; padding: 0.6rem 0.75rem; margin: 0.4rem 0 0.4rem 0;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.2rem;">
-                    <span style="font-size: 0.68rem; font-weight: 700; color: #818CF8; letter-spacing: 0.05em; text-transform: uppercase;">ACTIVE ENGINE</span>
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 0.8rem 0.9rem; margin: 1.25rem 0 0.6rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span style="font-size: 0.68rem; font-weight: 700; color: #64748B; letter-spacing: 0.05em; text-transform: uppercase;">ACTIVE ENGINE</span>
                     <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
                 </div>
-                <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary);">{short_model}</div>
-                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">1,500 free pages/day • ~0.4s/page</div>
+                <div style="font-size: 0.92rem; font-weight: 800; color: #0F172A;">{short_model}</div>
+                <div style="font-size: 0.74rem; color: #64748B; margin-top: 0.2rem;">1,500 free pages/day</div>
+                <div style="font-size: 0.74rem; color: #64748B; margin-top: 0.05rem;">~0.4s/page</div>
             </div>
             """
         else:
             status_card = """
-            <div style="background: var(--surface-alt, rgba(255,255,255,0.03)); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-radius: 9px; padding: 0.6rem 0.75rem; margin: 0.4rem 0 0.4rem 0;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.2rem;">
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 0.8rem 0.9rem; margin: 1.25rem 0 0.6rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
                     <span style="font-size: 0.68rem; font-weight: 700; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase;">ACTIVE ENGINE</span>
                     <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 6px #10B981;"></span>
                 </div>
-                <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-primary);">Marker Engine</div>
-                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">Local Offline Processing</div>
+                <div style="font-size: 0.92rem; font-weight: 800; color: #0F172A;">Marker Engine</div>
+                <div style="font-size: 0.74rem; color: #64748B; margin-top: 0.2rem;">Local Offline Processing</div>
             </div>
             """
 
@@ -457,8 +529,8 @@ def render_sidebar() -> None:
             recent = len([h for h in history if h.get("success", False)])
             st.markdown(
                 f"""
-                <div style="padding: 0.35rem 0.65rem; background: var(--surface-alt, rgba(255,255,255,0.02)); border: 1px solid var(--border, rgba(255,255,255,0.06)); border-radius: 7px; font-size: 0.75rem; display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
-                    <span style="color: var(--text-secondary);">Session Activity:</span>
+                <div style="padding: 0.35rem 0.65rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.75rem; display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <span style="color: #64748B;">Session Activity:</span>
                     <strong style="color: #10B981;">{recent} / {total} converted</strong>
                 </div>
                 """,
@@ -467,9 +539,9 @@ def render_sidebar() -> None:
 
         st.markdown(
             f"""
-            <div style="text-align: center; color: var(--text-muted); font-size: 0.7rem; padding-top: 0.75rem; opacity: 0.75;">
-                <p style="margin: 0; font-weight: 600;">{APP_NAME} v{APP_VERSION}</p>
-                <p style="margin: 0.1rem 0 0 0;">100% LaTeX Math Precision</p>
+            <div style="text-align: center; color: #94A3B8; font-size: 0.72rem; padding-top: 0.4rem;">
+                <p style="margin: 0; font-weight: 700; color: #64748B;">{APP_NAME} v{APP_VERSION}</p>
+                <p style="margin: 0.15rem 0 0 0;">100% LaTeX Math Precision</p>
             </div>
             """,
             unsafe_allow_html=True,
