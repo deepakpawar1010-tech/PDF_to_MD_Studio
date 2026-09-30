@@ -159,13 +159,16 @@ def apply_custom_css() -> None:
             font-family: 'JetBrains Mono', 'Courier New', monospace !important;
         }}
 
-        /* Main container - generous top spacing so headers are never cut off */
+        /* Main container - maximize screen width for spacious side-by-side viewing */
         .main .block-container,
         [data-testid="stMainBlockContainer"],
         [data-testid="block-container"] {{
-            padding-top: 4.5rem !important;
+            padding-top: 4.25rem !important;
             padding-bottom: 2rem !important;
-            max-width: 1220px !important;
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+            max-width: 98% !important;
+            width: 100% !important;
         }}
 
         /* Sidebar container - clean, sleek SaaS look */
