@@ -20,7 +20,7 @@ from core.constants import APP_NAME, APP_VERSION, PAGE_ICON
 from core.config import get_config
 from core.logger import LoggerManager, get_logger
 from core.session_manager import SessionManager, init_session
-from core.ui_helpers import apply_custom_css, render_sidebar, setup_page
+from core.ui_helpers import apply_custom_css, render_html, render_sidebar, setup_page
 
 logger = get_logger(__name__)
 
@@ -46,29 +46,24 @@ def render_home() -> None:
     # =========================================================================
     # HERO SECTION (2-Column Layout matching media_1790760964862.png)
     # =========================================================================
-    st.markdown(
+    render_html(
         f"""
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0.2rem 0 1rem 0; flex-wrap: wrap;">
-            <!-- LEFT COLUMN: Headline & Features -->
             <div style="flex: 1 1 520px; max-width: 580px;">
-                <!-- Engine Pill Badge -->
                 <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: #EEF2FF; border: 1px solid #E0E7FF; padding: 0.28rem 0.85rem; border-radius: 9999px; margin-bottom: 0.85rem;">
                     <span style="color: #6366F1; font-size: 0.9rem; font-weight: 800;">⚡</span>
                     <span style="font-size: 0.78rem; font-weight: 700; color: #4F46E5;">Powered by {short_model if current_engine == 'gemini' else 'Marker Engine'}</span>
                 </div>
                 
-                <!-- Main Heading -->
                 <h1 style="font-size: 2.75rem; font-weight: 900; line-height: 1.15; margin: 0 0 0.85rem 0; letter-spacing: -0.03em; color: #0F172A;">
                     Turn Complex PDFs into<br>
                     <span style="background: linear-gradient(135deg, #4338CA 0%, #6366F1 45%, #A855F7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Flawless Markdown</span>
                 </h1>
                 
-                <!-- Subtitle -->
                 <p style="font-size: 0.98rem; color: #64748B; line-height: 1.55; margin: 0 0 1.25rem 0; max-width: 520px;">
                     High-precision document conversion with 100% accurate LaTeX math, side-by-side 50:50 comparison, instant Mathpix equation copying, and automatic download.
                 </p>
                 
-                <!-- 5 Feature Badges Row -->
                 <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
                     <span style="background: #FFFFFF; border: 1px solid #E2E8F0; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #334155; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: inline-flex; align-items: center; gap: 0.35rem;">
                         🎯 100% LaTeX Precision
@@ -88,18 +83,14 @@ def render_home() -> None:
                 </div>
             </div>
             
-            <!-- RIGHT COLUMN: Graphic Illustration (PDF to Markdown conversion) -->
             <div style="flex: 1 1 380px; max-width: 470px; min-width: 320px; position: relative; display: flex; align-items: center; justify-content: center; padding: 1.5rem 0.5rem;">
-                <!-- Ambient radial background glow -->
                 <div style="position: absolute; width: 340px; height: 260px; background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 75%); border-radius: 50%; pointer-events: none;"></div>
                 
-                <!-- Floating Sparkle Icon Badge -->
                 <div style="position: absolute; top: -4px; right: 55px; width: 32px; height: 32px; border-radius: 50%; background: #F5F3FF; border: 1px solid #DDD6FE; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2); font-size: 1rem; color: #9333EA; z-index: 6;">
                     ✨
                 </div>
 
                 <div style="display: flex; align-items: center; justify-content: center; position: relative; width: 100%;">
-                    <!-- LEFT CARD: PDF Preview -->
                     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); padding: 13px 14px; width: 185px; transform: rotate(-3.5deg); position: relative; z-index: 1;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                             <span style="background: #EF4444; color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 5px; letter-spacing: 0.04em;">PDF</span>
@@ -113,7 +104,6 @@ def render_home() -> None:
                             ∫<sub>-∞</sub><sup>∞</sup> e<sup>-x²</sup> dx
                         </div>
                         
-                        <!-- Gaussian Bell Curve Plot -->
                         <div style="background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 8px; padding: 6px 4px 4px 4px; margin-top: 4px;">
                             <svg viewBox="0 0 140 60" style="width: 100%; height: 48px; display: block;">
                                 <defs>
@@ -130,12 +120,10 @@ def render_home() -> None:
                         </div>
                     </div>
 
-                    <!-- CENTER CONVERSION ARROW BUTTON -->
                     <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #6366F1, #8B5CF6); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.45); color: #FFFFFF; font-size: 1.15rem; font-weight: bold; z-index: 5; margin: 0 -16px; border: 2px solid #FFFFFF; flex-shrink: 0;">
                         →
                     </div>
 
-                    <!-- RIGHT CARD: Markdown Preview -->
                     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 16px 36px rgba(99,102,241,0.14); padding: 13px 14px; width: 205px; transform: rotate(3deg); position: relative; z-index: 3;">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                             <span style="background: #4F46E5; color: #FFFFFF; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 5px;">Markdown</span>
@@ -158,8 +146,7 @@ def render_home() -> None:
                 </div>
             </div>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
     # =========================================================================
@@ -169,7 +156,7 @@ def render_home() -> None:
 
     with col1:
         with st.container(border=True):
-            st.markdown(
+            render_html(
                 """
                 <div style="padding: 0.25rem 0.1rem 0.4rem 0.1rem;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
@@ -185,15 +172,14 @@ def render_home() -> None:
                         Upload PDFs, convert in seconds, and review with 50:50 side-by-side comparison & Mathpix-style LaTeX copy.
                     </p>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
             if st.button("Launch Studio →", key="btn_studio", type="primary", use_container_width=True):
                 st.switch_page("pages/1_⚡_Studio.py")
 
     with col2:
         with st.container(border=True):
-            st.markdown(
+            render_html(
                 """
                 <div style="padding: 0.25rem 0.1rem 0.4rem 0.1rem;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
@@ -209,15 +195,14 @@ def render_home() -> None:
                         Open or paste any Markdown file with KaTeX math rendering, in-document search, and Mathpix equation copy.
                     </p>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
             if st.button("Open Viewer →", key="btn_viewer", use_container_width=True):
                 st.switch_page("pages/2_📜_Viewer.py")
 
     with col3:
         with st.container(border=True):
-            st.markdown(
+            render_html(
                 """
                 <div style="padding: 0.25rem 0.1rem 0.4rem 0.1rem;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
@@ -233,8 +218,7 @@ def render_home() -> None:
                         Configure your Gemini API key, choose models, toggle dark/light theme, and adjust OCR preferences.
                     </p>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
             if st.button("Open Settings →", key="btn_settings", use_container_width=True):
                 st.switch_page("pages/3_⚙️_Settings.py")
@@ -243,10 +227,9 @@ def render_home() -> None:
     # BOTTOM WORKFLOW PIPELINE (3-Step Pipeline matching mockup)
     # =========================================================================
     with st.container(border=True):
-        st.markdown(
+        render_html(
             """
             <div style="padding: 0.35rem 0.35rem;">
-                <!-- Header Row -->
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
                     <div style="display: flex; align-items: center; gap: 0.45rem;">
                         <span style="color: #6366F1; font-size: 1rem;">⚡</span>
@@ -259,10 +242,8 @@ def render_home() -> None:
                     </span>
                 </div>
                 
-                <!-- 3 Steps Grid with Connecting Arrows -->
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
                     
-                    <!-- STEP 1 -->
                     <div style="flex: 1 1 240px; display: flex; align-items: flex-start; gap: 0.75rem;">
                         <div style="background: #EEF2FF; color: #6366F1; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 10px;">
                             1
@@ -276,12 +257,10 @@ def render_home() -> None:
                         </div>
                     </div>
 
-                    <!-- ARROW 1 -->
                     <div style="color: #CBD5E1; font-size: 1.3rem; font-weight: bold; padding: 0 0.2rem;">
                         →
                     </div>
 
-                    <!-- STEP 2 -->
                     <div style="flex: 1 1 240px; display: flex; align-items: flex-start; gap: 0.75rem;">
                         <div style="background: #EEF2FF; color: #6366F1; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 10px;">
                             2
@@ -295,12 +274,10 @@ def render_home() -> None:
                         </div>
                     </div>
 
-                    <!-- ARROW 2 -->
                     <div style="color: #CBD5E1; font-size: 1.3rem; font-weight: bold; padding: 0 0.2rem;">
                         →
                     </div>
 
-                    <!-- STEP 3 -->
                     <div style="flex: 1 1 240px; display: flex; align-items: flex-start; gap: 0.75rem;">
                         <div style="background: #EEF2FF; color: #6366F1; width: 22px; height: 22px; border-radius: 50%; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 10px;">
                             3
@@ -316,29 +293,27 @@ def render_home() -> None:
 
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
     # Activity Shelf (only shown when conversions exist in session)
     history = SessionManager.get_conversion_history()
     if history:
         with st.container(border=True):
-            st.markdown(
+            render_html(
                 """
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
                     <span style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">📊 Recent Activity in this Session</span>
                     <span style="font-size: 0.75rem; color: #64748B;">Saved in memory</span>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
             for record in history[:4]:
                 status_icon = "✅" if record.get("success") else "❌"
                 file_name = record.get("input_name", "Document.pdf")
                 timestamp = record.get("timestamp", "")[:19].replace("T", " ")
                 engine_used = record.get("engine", "gemini").capitalize()
-                st.markdown(
+                render_html(
                     f"""
                     <div style="padding: 0.45rem 0.7rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 7px; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
                         <div>
@@ -348,20 +323,18 @@ def render_home() -> None:
                         </div>
                         <span style="color: #64748B; font-size: 0.75rem;">{timestamp}</span>
                     </div>
-                    """,
-                    unsafe_allow_html=True,
+                    """
                 )
 
     # Clean, tight SaaS footer
-    st.markdown(
+    render_html(
         f"""
         <div style="text-align: center; color: #94A3B8; font-size: 0.72rem; padding: 0.75rem 0 0.5rem 0; margin-top: 0.75rem; border-top: 1px solid #E2E8F0; opacity: 0.85;">
             <span>{APP_NAME} v{APP_VERSION} • High-Fidelity Math & Document Intelligence</span>
             <span style="margin: 0 0.4rem;">•</span>
             <span>Powered by <strong>Google Gemini Vision</strong> & <strong>Marker</strong></span>
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 

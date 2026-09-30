@@ -5,6 +5,7 @@ Streamlit-specific UI components, styling, and helper functions
 for consistent interface across all pages.
 """
 
+import textwrap
 from pathlib import Path
 from typing import Any, Callable, List, Optional, Tuple
 
@@ -21,6 +22,18 @@ from core.constants import (
 from core.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def render_html(html_str: str) -> None:
+    """
+    Render raw HTML safely without Markdown parser converting leading spaces
+    or empty newlines into code blocks.
+    """
+    clean_html = textwrap.dedent(html_str).strip()
+    if hasattr(st, "html"):
+        st.html(clean_html)
+    else:
+        st.markdown(clean_html, unsafe_allow_html=True)
 
 
 # =============================================================================
@@ -521,30 +534,28 @@ def render_sidebar() -> None:
             </div>
             """
 
-        st.markdown(status_card, unsafe_allow_html=True)
+        render_html(status_card)
 
         history = SessionManager.get_conversion_history()
         if history:
             total = len(history)
             recent = len([h for h in history if h.get("success", False)])
-            st.markdown(
+            render_html(
                 f"""
                 <div style="padding: 0.35rem 0.65rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 0.75rem; display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
                     <span style="color: #64748B;">Session Activity:</span>
                     <strong style="color: #10B981;">{recent} / {total} converted</strong>
                 </div>
-                """,
-                unsafe_allow_html=True,
+                """
             )
 
-        st.markdown(
+        render_html(
             f"""
             <div style="text-align: center; color: #94A3B8; font-size: 0.72rem; padding-top: 0.4rem;">
                 <p style="margin: 0; font-weight: 700; color: #64748B;">{APP_NAME} v{APP_VERSION}</p>
                 <p style="margin: 0.15rem 0 0 0;">100% LaTeX Math Precision</p>
             </div>
-            """,
-            unsafe_allow_html=True,
+            """
         )
 
 
