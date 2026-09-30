@@ -134,8 +134,12 @@ def apply_custom_css() -> None:
             --shadow-hover: 0 10px 30px rgba(99, 102, 241, 0.25);
         }}
 
-        [data-testid="stAppViewContainer"], .stApp, [data-testid="stHeader"] {{
+        [data-testid="stAppViewContainer"], .stApp {{
             background-color: var(--surface) !important;
+        }}
+        [data-testid="stHeader"] {{
+            background-color: transparent !important;
+            z-index: 10 !important;
         }}
         [data-testid="stSidebar"] {{
             background-color: {palette["sidebar_bg"]} !important;
@@ -155,12 +159,12 @@ def apply_custom_css() -> None:
             font-family: 'JetBrains Mono', 'Courier New', monospace !important;
         }}
 
-        /* Main container - tight, modern padding */
+        /* Main container - generous top spacing so headers are never cut off */
         .main .block-container,
         [data-testid="stMainBlockContainer"],
         [data-testid="block-container"] {{
-            padding-top: 0.8rem !important;
-            padding-bottom: 1.5rem !important;
+            padding-top: 4.5rem !important;
+            padding-bottom: 2rem !important;
             max-width: 1220px !important;
         }}
 
