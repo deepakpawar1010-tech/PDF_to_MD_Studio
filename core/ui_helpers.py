@@ -1304,17 +1304,21 @@ def render_markdown_with_math(content: str, height: int = 700) -> None:
     )
 
 
-def trigger_auto_download(content: str, filename: str) -> None:
+def trigger_auto_download(content: Any, filename: str, mime_type: str = "text/markdown") -> None:
     """
-    Trigger automatic client-side browser download of the converted Markdown file
+    Trigger automatic client-side browser download of the converted Markdown or ZIP file
     using a base64 data-URL / blob download iframe.
     """
     import base64
     import json
     import streamlit.components.v1 as components
 
-    b64_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+    if isinstance(content, bytes):
+        b64_content = base64.b64encode(content).decode("utf-8")
+    else:
+        b64_content = base64.b64encode(str(content).encode("utf-8")).decode("utf-8")
     safe_filename = json.dumps(filename)
+    safe_mime = json.dumps(mime_type)
 
     dl_html = f"""
     <!DOCTYPE html>
@@ -1325,13 +1329,14 @@ def trigger_auto_download(content: str, filename: str) -> None:
             try {{
                 const b64 = "{b64_content}";
                 const filename = {safe_filename};
+                const mime = {safe_mime};
                 const byteCharacters = atob(b64);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {{
                     byteNumbers[i] = byteCharacters.charCodeAt(i);
                 }}
                 const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], {{ type: 'text/markdown;charset=utf-8' }});
+                const blob = new Blob([byteArray], {{ type: mime }});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';

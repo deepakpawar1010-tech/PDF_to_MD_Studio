@@ -116,8 +116,12 @@ class ConversionManager:
         output_dir: Optional[Path] = None,
         progress_queue: Optional["queue.Queue"] = None,
         create_zip: bool = False,
+        engine_type: Optional[str] = None,
     ) -> Tuple[bool, str, List[Path], Optional[Path]]:
-        """Convert multiple PDFs."""
+        """
+        Convert multiple PDFs using Gemini or Marker engine.
+        Supports automatic ZIP archiving, fallback routing, and real-time progress updates.
+        """
         if not input_paths:
             return False, "No files provided.", [], None
         
@@ -128,80 +132,142 @@ class ConversionManager:
             output_dir = output_dir.parent
         
         self.file_manager.ensure_dir(output_dir)
-        
-        batch_temp = self.file_manager.generate_unique_temp_dir()
-        batch_input = batch_temp / "input"
-        batch_output = batch_temp / "output"
-        
-        try:
-            batch_input.mkdir(parents=True, exist_ok=True)
-            batch_output.mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            self._safe_cleanup(batch_temp)
-            return False, f"Failed to create working directories: {e}", [], None
-        
+
+        # Determine engine
+        selected_engine = engine_type or get_config().get("engine", "gemini")
+        use_gemini = selected_engine == "gemini" and self.gemini_engine.is_available()
+
         output_files: List[Path] = []
-        
-        try:
-            for file_path in input_paths:
-                try:
-                    shutil.copy2(str(file_path), str(batch_input / file_path.name))
-                except Exception as e:
-                    logger.warning(f"Failed to copy {file_path.name}: {e}")
-            
-            extra_args = self._build_extra_args()
-            
-            success, message, converted_files = self.engine.convert_batch(
-                input_dir=batch_input,
-                output_dir=batch_output,
-                extra_args=extra_args,
-                progress_queue=progress_queue,
-            )
-            
-            if not converted_files:
-                return False, message or "No files converted.", [], None
-            
-            for converted in converted_files:
-                original_stem = converted.stem
-                actual_ext = converted.suffix  # preserves .md / .json / .html
-                final_path = output_dir / f"{original_stem}{actual_ext}"
-                
-                counter = 1
-                final_dest = final_path
-                while final_dest.exists():
-                    final_dest = output_dir / f"{original_stem}_{counter}{actual_ext}"
-                    counter += 1
+        total_files = len(input_paths)
+
+        if use_gemini:
+            logger.info(f"Starting Gemini batch conversion for {total_files} file(s)")
+            for i, file_path in enumerate(input_paths):
+                if progress_queue is not None:
+                    pct = i / max(total_files, 1)
+                    msg = f"Converting file {i + 1}/{total_files}: {file_path.name}"
+                    try:
+                        progress_queue.put(("stage", {
+                            "overall": pct,
+                            "raw_line": msg,
+                        }), block=False)
+                    except Exception:
+                        pass
                 
                 try:
-                    moved = self.file_manager.move_file(converted, final_dest)
-                    self._maybe_auto_cleanup(moved, "")
-                    output_files.append(moved)
-                except Exception as e:
-                    logger.warning(f"Failed to move {converted.name}: {e}")
-            
-            self._copy_assets(batch_output, output_dir, None)
-            
-            zip_path: Optional[Path] = None
-            if create_zip and output_files:
-                try:
-                    zip_path = create_zip_archive(
-                        files=output_files,
+                    success, msg, out_file = self.convert_single(
+                        input_path=file_path,
                         output_dir=output_dir,
-                        archive_name=None,
+                        progress_queue=None,
+                        engine_type="gemini",
                     )
+                    if success and out_file and out_file.exists():
+                        output_files.append(out_file)
+                    else:
+                        logger.warning(f"Batch item failed ({file_path.name}): {msg}")
                 except Exception as e:
-                    logger.warning(f"Failed to create ZIP: {e}")
-            
-            SessionManager.set_batch_files([str(f) for f in output_files])
-            if zip_path:
-                SessionManager.set_zip_output_path(str(zip_path))
-            
-            success = len(output_files) > 0
-            return success, message, output_files, zip_path
-            
-        finally:
-            if get_config().get("auto_cleanup", True):
-                self._safe_cleanup(batch_temp)
+                    logger.error(f"Error converting {file_path.name} in batch: {e}")
+
+            if progress_queue is not None:
+                try:
+                    progress_queue.put(("stage", {
+                        "overall": 1.0,
+                        "raw_line": f"Completed {len(output_files)} of {total_files} files",
+                    }), block=False)
+                except Exception:
+                    pass
+
+        else:
+            logger.info(f"Starting Marker batch conversion for {total_files} file(s)")
+            if self.marker_engine.is_batch_available():
+                batch_temp = self.file_manager.generate_unique_temp_dir()
+                batch_input = batch_temp / "input"
+                batch_output = batch_temp / "output"
+                
+                try:
+                    batch_input.mkdir(parents=True, exist_ok=True)
+                    batch_output.mkdir(parents=True, exist_ok=True)
+                    
+                    for file_path in input_paths:
+                        try:
+                            shutil.copy2(str(file_path), str(batch_input / file_path.name))
+                        except Exception as e:
+                            logger.warning(f"Failed to copy {file_path.name}: {e}")
+                    
+                    extra_args = self._build_extra_args()
+                    success, message, converted_files = self.marker_engine.convert_batch(
+                        input_dir=batch_input,
+                        output_dir=batch_output,
+                        extra_args=extra_args,
+                        progress_queue=progress_queue,
+                    )
+                    
+                    if converted_files:
+                        for converted in converted_files:
+                            original_stem = converted.stem
+                            actual_ext = converted.suffix
+                            final_path = output_dir / f"{original_stem}{actual_ext}"
+                            counter = 1
+                            final_dest = final_path
+                            while final_dest.exists():
+                                final_dest = output_dir / f"{original_stem}_{counter}{actual_ext}"
+                                counter += 1
+                            try:
+                                moved = self.file_manager.move_file(converted, final_dest)
+                                self._maybe_auto_cleanup(moved, "")
+                                output_files.append(moved)
+                            except Exception as e:
+                                logger.warning(f"Failed to move {converted.name}: {e}")
+                        self._copy_assets(batch_output, output_dir, None)
+                finally:
+                    if get_config().get("auto_cleanup", True):
+                        self._safe_cleanup(batch_temp)
+            else:
+                for i, file_path in enumerate(input_paths):
+                    if progress_queue is not None:
+                        pct = i / max(total_files, 1)
+                        msg = f"Converting file {i + 1}/{total_files}: {file_path.name}"
+                        try:
+                            progress_queue.put(("stage", {
+                                "overall": pct,
+                                "raw_line": msg,
+                            }), block=False)
+                        except Exception:
+                            pass
+                    try:
+                        success, msg, out_file = self.convert_single(
+                            input_path=file_path,
+                            output_dir=output_dir,
+                            progress_queue=None,
+                            engine_type="marker",
+                        )
+                        if success and out_file and out_file.exists():
+                            output_files.append(out_file)
+                    except Exception as e:
+                        logger.error(f"Error converting {file_path.name}: {e}")
+
+        zip_path: Optional[Path] = None
+        if create_zip and output_files:
+            try:
+                zip_path = create_zip_archive(
+                    files=output_files,
+                    output_dir=output_dir,
+                    archive_name=None,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to create ZIP: {e}")
+
+        SessionManager.set_batch_files([str(f) for f in output_files])
+        if zip_path:
+            SessionManager.set_zip_output_path(str(zip_path))
+
+        success = len(output_files) > 0
+        message = (
+            f"Successfully converted {len(output_files)} of {total_files} files."
+            if success
+            else "Failed to convert files in batch."
+        )
+        return success, message, output_files, zip_path
     
     def convert_uploaded(
         self,

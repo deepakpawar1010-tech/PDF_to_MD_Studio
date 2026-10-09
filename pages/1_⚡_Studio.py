@@ -280,6 +280,7 @@ def run_batch_conversion_with_progress(
     create_zip: bool,
     panel_placeholder,
     progress_bar,
+    engine_type: Optional[str] = None,
 ) -> Tuple[bool, str, List[Path], Optional[Path]]:
     """Run batch conversion with queue-based, STAGE-AWARE progress updates."""
     progress_queue = queue.Queue()
@@ -305,6 +306,7 @@ def run_batch_conversion_with_progress(
                 output_dir=output_dir,
                 progress_queue=progress_queue,
                 create_zip=create_zip,
+                engine_type=engine_type,
             )
             result_container["success"] = success
             result_container["message"] = message
@@ -381,6 +383,7 @@ def run_batch_conversion_with_progress(
 def handle_batch_conversion(
     uploaded_files: List,
     saved_paths: List[Path],
+    engine_type: Optional[str] = None,
 ) -> None:
     """Handle batch file conversion."""
     manager = get_conversion_manager()
@@ -398,6 +401,7 @@ def handle_batch_conversion(
             create_zip=create_zip,
             panel_placeholder=panel_placeholder,
             progress_bar=progress_bar,
+            engine_type=engine_type,
         )
 
         panel_placeholder.empty()
@@ -405,6 +409,15 @@ def handle_batch_conversion(
 
         if success:
             show_success("Batch Conversion Complete!", message)
+
+            # Automatically trigger download of the ZIP archive if available
+            if zip_path and Path(zip_path).exists():
+                try:
+                    with open(zip_path, "rb") as f_zip:
+                        zip_bytes = f_zip.read()
+                    trigger_auto_download(zip_bytes, Path(zip_path).name, mime_type="application/zip")
+                except Exception as e_dl:
+                    logger.warning(f"Batch auto-download failed: {e_dl}")
 
             results_data = []
             for output_file in output_files:
@@ -424,6 +437,13 @@ def handle_batch_conversion(
             if zip_path and Path(zip_path).exists():
                 st.markdown("---")
                 download_button(zip_path, "Download ZIP Archive", "application/zip")
+
+            st.markdown("---")
+            st.markdown("### ⬇️ Individual Converted Files")
+            cols = st.columns(min(len(output_files), 4))
+            for i, output_file in enumerate(output_files):
+                with cols[i % len(cols)]:
+                    download_button(str(output_file), f"Download {Path(output_file).name}")
 
         else:
             show_error("Batch Conversion Failed", message)
@@ -813,7 +833,7 @@ def render_conversion_page() -> None:
                 with b_c2:
                     if st.button("🚀 Convert All", type="primary", use_container_width=True):
                         with st.spinner("Processing batch..."):
-                            handle_batch_conversion(valid_files, saved_paths)
+                            handle_batch_conversion(valid_files, saved_paths, engine_type=eng_val)
 
     # =========================================================================
     # RECENT CONVERSIONS SECTION
