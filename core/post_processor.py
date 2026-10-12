@@ -286,11 +286,96 @@ def fix_replacement_characters(content: str) -> Tuple[str, int]:
     return content, count
 
 
+def fix_html_entities(content: str) -> Tuple[str, int]:
+    """
+    Fixes HTML entity escape artifacts like &gt;, &lt;, &amp;, &ge;, &le;
+    both within LaTeX math blocks and across markdown text into clean symbols:
+        $\\vec{F}_p &gt; m\\vec{a}$ -> $\\vec{F}_p > m\\vec{a}$
+        $x &lt; y$ -> $x < y$
+        $x &ge; y$ -> $x \\ge y$
+        $x &le; y$ -> $x \\le y$
+        &amp;gt; -> >
+        &amp; -> &
+    """
+    count = 0
+
+    # 1. Double-escaped entities (&amp;gt; -> &gt;, etc.)
+    double_escaped = [
+        (re.compile(r"&amp;gt;", re.IGNORECASE), "&gt;"),
+        (re.compile(r"&amp;lt;", re.IGNORECASE), "&lt;"),
+        (re.compile(r"&amp;ge;", re.IGNORECASE), "&ge;"),
+        (re.compile(r"&amp;le;", re.IGNORECASE), "&le;"),
+        (re.compile(r"&amp;ne;", re.IGNORECASE), "&ne;"),
+        (re.compile(r"&amp;amp;", re.IGNORECASE), "&amp;"),
+    ]
+    for pattern, repl in double_escaped:
+        matches = len(pattern.findall(content))
+        if matches:
+            content = pattern.sub(lambda _m, r=repl: r, content)
+            count += matches
+
+    # 2. Math-specific replacements inside $$...$$ and $...$
+    math_entities = [
+        (re.compile(r"&(?:gt|#62|#062|#x3e);", re.IGNORECASE), ">"),
+        (re.compile(r"&(?:lt|#60|#060|#x3c);", re.IGNORECASE), "<"),
+        (re.compile(r"&(?:ge|#8805|#x2265);(?:\s*)", re.IGNORECASE), r"\ge "),
+        (re.compile(r"&(?:le|#8804|#x2264);(?:\s*)", re.IGNORECASE), r"\le "),
+        (re.compile(r"&(?:ne|#8800|#x2260);(?:\s*)", re.IGNORECASE), r"\ne "),
+        (re.compile(r"&(?:plusmn|#177|#xb1);(?:\s*)", re.IGNORECASE), r"\pm "),
+        (re.compile(r"&(?:times|#215|#xd7);(?:\s*)", re.IGNORECASE), r"\times "),
+        (re.compile(r"&(?:divide|#247|#xf7);(?:\s*)", re.IGNORECASE), r"\div "),
+        (re.compile(r"&(?:approx|#8776|#x2248);(?:\s*)", re.IGNORECASE), r"\approx "),
+        (re.compile(r"&(?:amp|#38|#038|#x26);", re.IGNORECASE), "&"),
+        (re.compile(r"&(?:nbsp|#160|#xa0);", re.IGNORECASE), " "),
+    ]
+
+    def _clean_math_block(match: re.Match) -> str:
+        nonlocal count
+        delim = match.group(1)
+        inner = match.group(2)
+        for pattern, repl in math_entities:
+            n_match = len(pattern.findall(inner))
+            if n_match:
+                inner = pattern.sub(lambda _m, r=repl: r, inner)
+                count += n_match
+        return f"{delim}{inner}{delim}"
+
+    # Match $$...$$ (display math)
+    display_math_re = re.compile(r"(\$\$)([\s\S]+?)\1")
+    content = display_math_re.sub(_clean_math_block, content)
+
+    # Match $...$ (inline math, excluding $$)
+    inline_math_re = re.compile(r"(?<!\$)(\$)([^$\n]+?)\1(?!\$)")
+    content = inline_math_re.sub(_clean_math_block, content)
+
+    # 3. General markdown text replacements (outside or across document)
+    general_entities = [
+        (re.compile(r"&(?:gt|#62|#062|#x3e);", re.IGNORECASE), ">"),
+        (re.compile(r"&(?:lt|#60|#060|#x3c);", re.IGNORECASE), "<"),
+        (re.compile(r"&(?:ge|#8805|#x2265);", re.IGNORECASE), ">="),
+        (re.compile(r"&(?:le|#8804|#x2264);", re.IGNORECASE), "<="),
+        (re.compile(r"&(?:ne|#8800|#x2260);", re.IGNORECASE), "!="),
+        (re.compile(r"&(?:plusmn|#177|#xb1);", re.IGNORECASE), "±"),
+        (re.compile(r"&(?:amp|#38|#038|#x26);", re.IGNORECASE), "&"),
+        (re.compile(r"&(?:quot|#34|#x22);", re.IGNORECASE), '"'),
+        (re.compile(r"&(?:apos|#39|#x27);", re.IGNORECASE), "'"),
+        (re.compile(r"&(?:nbsp|#160|#xa0);", re.IGNORECASE), " "),
+    ]
+    for pattern, repl in general_entities:
+        matches = len(pattern.findall(content))
+        if matches:
+            content = pattern.sub(lambda _m, r=repl: r, content)
+            count += matches
+
+    return content, count
+
+
 # Registry of available fixes - each is (id, label, function).
 # Kept as a list of tuples (not a dict) to preserve a deterministic run order:
 # question-number fix first (most impactful), math fixes, whitespace cleanup last.
 AVAILABLE_FIXES = [
     ("trailing_question_numbers", "Fix misplaced question numbers", fix_trailing_question_numbers),
+    ("fix_html_entities", "Convert HTML entities (&gt;, &lt;, &amp;) to clean symbols", fix_html_entities),
     ("corrupted_math_subscripts", "Repair corrupted math formulas (combinations & permutations)", fix_corrupted_math_subscripts),
     ("split_inline_math", "Join split inline math expressions ($x$ + $y$)", fix_split_inline_math),
     ("fix_replacement_characters", "Fix unicode replacement characters ()", fix_replacement_characters),

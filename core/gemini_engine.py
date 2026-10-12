@@ -38,6 +38,7 @@ Strict Formatting Rules:
 3. Clean Characters & Output:
    - Output ONLY the markdown text. Do NOT wrap the response in ```markdown or ``` fences.
    - Never output unicode replacement characters (U+FFFD ). For single variables or mathematical terms, wrap them in math delimiters (e.g. '$n$', '$x$').
+   - Never use HTML entities (such as &gt;, &lt;, &amp;, &ge;, &le;). Always use standard comparison characters (> and <) or standard LaTeX commands (\\ge, \\le, \\ne, \\pm).
 """
 
 
